@@ -13,6 +13,7 @@ const DAEMON_ID = process.env.DAEMON_ID || "local-daemon";
 const POLL_INTERVAL_MS = Number(process.env.DAEMON_POLL_INTERVAL_MS || 5000);
 const CLAUDE_BIN = process.env.CLAUDE_BIN || "claude";
 const CODEX_BIN = process.env.CODEX_BIN || "codex";
+const VERSION = "praxia-core-daemon-v0";
 
 if (!DASHBOARD_WRITE_KEY) {
   console.error("DASHBOARD_WRITE_KEY is required. Put it in ~/.praxia/dashboard.env or the process environment.");
@@ -112,6 +113,12 @@ function runProcess({ agent, body, cwd }) {
 }
 
 async function tick() {
+  await api("POST", "/api/daemon/heartbeat", {
+    daemonId: DAEMON_ID,
+    dashboardUrl: DASHBOARD_URL,
+    version: VERSION,
+    note: "polling",
+  });
   const { command } = await api("POST", "/api/commands/claim", { daemonId: DAEMON_ID });
   if (!command) return;
   log(`claimed command ${command.id} for ${command.project_name}`);

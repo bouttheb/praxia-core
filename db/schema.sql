@@ -77,3 +77,11 @@ CREATE TABLE IF NOT EXISTS commands (
 
 CREATE INDEX IF NOT EXISTS commands_status_idx ON commands(status, created_at);
 CREATE INDEX IF NOT EXISTS commands_project_idx ON commands(project_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS daemon_heartbeats (
+  daemon_id TEXT PRIMARY KEY,
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  dashboard_url TEXT,
+  version TEXT,
+  note TEXT
+);

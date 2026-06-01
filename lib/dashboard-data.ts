@@ -256,6 +256,24 @@ export async function loadCommands(limit = 50): Promise<CommandRow[]> {
   `;
 }
 
+export type DaemonHeartbeat = {
+  daemon_id: string;
+  last_seen_at: string;
+  dashboard_url: string | null;
+  version: string | null;
+  note: string | null;
+};
+
+export async function loadDaemonHeartbeats(): Promise<DaemonHeartbeat[]> {
+  if (!process.env.DATABASE_URL) return [];
+  return sql<DaemonHeartbeat[]>`
+    SELECT daemon_id, last_seen_at, dashboard_url, version, note
+    FROM daemon_heartbeats
+    ORDER BY last_seen_at DESC
+    LIMIT 12
+  `;
+}
+
 export function averageProgress(areas: AreaWithProjects[]) {
   const projects = areas.flatMap((area) => area.projects);
   if (projects.length === 0) return 0;

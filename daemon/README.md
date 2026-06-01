@@ -26,6 +26,9 @@ EOF
 node daemon/dashboard-daemon.mjs
 ```
 
+When connected, the setup page will show the daemon id under connected
+machines. The daemon sends a heartbeat before polling for queued commands.
+
 ## Safety Model
 
 - The dashboard stores one `working_directory` per project.

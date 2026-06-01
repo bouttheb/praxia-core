@@ -44,6 +44,24 @@ cp .env.local ~/.praxia/dashboard.env
 node daemon/dashboard-daemon.mjs
 ```
 
+The setup page shows recent daemon heartbeats once the local runner connects.
+
+## Onboarding Projects
+
+Open `/setup` and add one row per repo:
+
+- **Area**: a group such as Open Source, Client Work, or Personal Projects.
+- **Project name**: the display name on the dashboard.
+- **Working directory**: the repo path as seen by the daemon machine.
+- **Default agent**: `claude` for Claude Code or `codex` for Codex.
+
+After adding a project, open its details and use **Sync docs** to pull in
+`README.md`, `docs/VISION.md`, `VISION.md`, `ARCHITECTURE.md`, or
+`docs/ARCHITECTURE.md` when those files exist on the web app host. If your web
+app is hosted away from the machine with the repos, keep the working directory
+configured for the daemon and use progress updates/command results as the live
+source of truth.
+
 ## Deployment Shape
 
 The web app can run anywhere Next.js and Postgres run. The daemon should run on

@@ -6,6 +6,7 @@ Status: local inspection build, not published.
 
 - Created a separate `praxia-core` workspace.
 - Ported only the generic dashboard, project cards, command queue, source-doc sync, setup flow, run history, and daemon.
+- Added daemon heartbeat wiring so the setup page can show connected local runners.
 - Removed customer-specific routes, fixtures, screenshots, docs, and business workflows from the public shell.
 - Replaced seed data with neutral example projects.
 - Replaced public docs with generic Praxia Core positioning.

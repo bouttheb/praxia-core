@@ -22,6 +22,7 @@ Browser or phone -> Next.js app -> Postgres <- daemon -> local repo -> Codex/Cla
 - `updates`: progress log entries.
 - `commands`: queue rows claimed by the daemon.
 - `settings`: small key/value store for future local preferences.
+- `daemon_heartbeats`: recent daemon check-ins so setup can show connected machines.
 
 ## Dispatch Flow
 
@@ -32,3 +33,6 @@ Browser or phone -> Next.js app -> Postgres <- daemon -> local repo -> Codex/Cla
 5. Daemon runs `claude -p` or `codex exec` in the project's working directory.
 6. Daemon patches `/api/commands/:id` with completion, failure, or blocker state.
 7. Completed commands can create a progress update.
+
+The daemon also calls `POST /api/daemon/heartbeat` during its polling loop so
+the setup page can show whether a local runner has connected recently.
