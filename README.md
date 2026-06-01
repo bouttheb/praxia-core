@@ -1,12 +1,12 @@
 # Praxia Core
 
-Praxia Core is a self-hosted dashboard for people managing too many AI coding
-projects at once.
+Praxia Core is a self-hosted dashboard for running multiple Codex and Claude
+Code projects from your phone or any browser.
 
 It gives you one place to see every project, read its current README/vision
 snapshot, check the latest progress, and queue work for a local machine running
-Codex or Claude Code. The phone or browser is the remote control; your paired
-computer does the actual work in the local repo.
+Codex and Claude Code. Your browser is the remote control; your paired computer
+does the actual work in the local repo.
 
 ## What It Does
 

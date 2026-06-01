@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Praxia Core",
-  description: "Self-hosted AI project dashboard for Codex and Claude Code.",
+  description: "Self-hosted dashboard for running multiple Codex and Claude Code projects from your phone or any browser.",
   icons: {
     icon: [
       { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
