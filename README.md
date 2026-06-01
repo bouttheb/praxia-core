@@ -19,14 +19,24 @@ computer does the actual work in the local repo.
 
 ## Quick Start
 
+If you are asking Codex or Claude Code to install this repo for you, give it
+this prompt:
+
+```text
+Clone this Praxia Core repo, read AGENTS.md, run the local install steps,
+ask me for DATABASE_URL if it is missing, start the web app, start the daemon,
+and help me add my first projects by local repo path.
+```
+
 ```bash
 git clone https://github.com/your-org/praxia-core.git
 cd praxia-core
 npm install
-cp .env.example .env.local
+npm run install:local
 ```
 
-Fill in `DATABASE_URL` and `DASHBOARD_WRITE_KEY`, then:
+If `DATABASE_URL` is blank after the installer runs, add a Postgres connection
+string to `.env.local`, then:
 
 ```bash
 npm run db:init

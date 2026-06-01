@@ -15,12 +15,13 @@ export default async function SetupPage() {
             <div className="eyebrow">Setup</div>
             <h1 className="serif text-4xl mt-2">Connect your machine</h1>
             <p className="mt-2 text-sm" style={{ color: "var(--color-ink-mute)" }}>
-              Praxia Core has two halves: this web dashboard and a local daemon running where your repos live.
+              Give the repo to Codex or Claude Code, ask it to read AGENTS.md, then use this page to confirm the daemon and add projects.
             </p>
           </header>
 
           <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-5">
             <div className="space-y-5">
+              <AgentInstallCard />
               <SetupSteps />
               <ProjectCreateForm />
             </div>
@@ -35,6 +36,21 @@ export default async function SetupPage() {
   );
 }
 
+function AgentInstallCard() {
+  return (
+    <section className="surface-solid p-5">
+      <div className="eyebrow">AI-assisted install</div>
+      <h2 className="serif text-2xl mt-2">What to tell Codex or Claude Code</h2>
+      <p className="mt-2 text-sm" style={{ color: "var(--color-ink-mute)" }}>
+        The repo includes AGENTS.md and CLAUDE.md so an AI coding agent knows the install path. It can set up files and start processes, but it should ask you for a Postgres URL if one is missing.
+      </p>
+      <div className="mt-4 rounded-[14px] p-3" style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-sunken)" }}>
+        <code className="text-xs whitespace-pre-wrap">{`Clone this Praxia Core repo, read AGENTS.md, run the local install steps, ask me for DATABASE_URL if it is missing, start the web app, start the daemon, and help me add my first projects by local repo path.`}</code>
+      </div>
+    </section>
+  );
+}
+
 function SetupSteps() {
   return (
     <section className="surface-solid p-5">
@@ -42,21 +58,21 @@ function SetupSteps() {
       <div className="grid md:grid-cols-3 gap-3 mt-4">
         <StepCard
           number="1"
-          title="Start the web app"
-          body="Create .env.local, set DATABASE_URL and DASHBOARD_WRITE_KEY, then initialize Postgres."
-          command="npm run db:init"
+          title="Prepare config"
+          body="The helper writes .env.local and ~/.praxia/dashboard.env, generating a daemon key automatically."
+          command="npm run install:local"
         />
         <StepCard
           number="2"
-          title="Start the daemon"
-          body="Run the daemon on the computer that has your repos and logged-in AI CLIs."
-          command="node daemon/dashboard-daemon.mjs"
+          title="Initialize and run"
+          body="Add DATABASE_URL if needed, initialize Postgres, then start the dashboard."
+          command="npm run db:init && npm run dev"
         />
         <StepCard
           number="3"
-          title="Add projects"
-          body="Enter each repo's local path and choose whether Claude Code or Codex should run it."
-          command="/setup"
+          title="Connect daemon"
+          body="Run this on the machine that has your repos and logged-in AI CLIs."
+          command="node daemon/dashboard-daemon.mjs"
         />
       </div>
     </section>
@@ -106,8 +122,7 @@ function DaemonConnectionCard({
       </p>
 
       <div className="mt-4 rounded-[14px] p-3" style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-sunken)" }}>
-        <code className="text-xs whitespace-pre-wrap">{`mkdir -p ~/.praxia
-cp .env.local ~/.praxia/dashboard.env
+        <code className="text-xs whitespace-pre-wrap">{`npm run install:local
 node daemon/dashboard-daemon.mjs`}</code>
       </div>
 

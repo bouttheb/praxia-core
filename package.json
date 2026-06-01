@@ -16,6 +16,7 @@
     "dev": "next dev -p 3030",
     "build": "next build",
     "start": "next start -p 3030",
+    "install:local": "node scripts/install-local.mjs",
     "db:init": "tsx scripts/init-db.ts",
     "db:seed": "tsx scripts/seed.ts",
     "audit:private-names": "echo \"Run your own private-name rg command before publishing.\"",
