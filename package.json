@@ -4,14 +4,6 @@
   "private": true,
   "description": "Self-hosted AI project dashboard for running Codex and Claude Code projects from your phone.",
   "license": "AGPL-3.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/your-org/praxia-core.git"
-  },
-  "homepage": "https://github.com/your-org/praxia-core#readme",
-  "bugs": {
-    "url": "https://github.com/your-org/praxia-core/issues"
-  },
   "scripts": {
     "dev": "next dev -p 3030",
     "build": "next build",

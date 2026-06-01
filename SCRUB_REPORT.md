@@ -14,11 +14,13 @@ Status: local inspection build, not published.
 - Removed customer-specific routes, fixtures, screenshots, docs, and business workflows from the public shell.
 - Replaced seed data with neutral example projects.
 - Replaced public docs with generic Praxia Core positioning.
+- Kept the code of conduct generic, with no personal contact details.
 - Preserved the existing AGPL-3.0 license family.
 
 ## Checks
 
 - Production build: passed.
+- Local browser check: passed for `/`, `/setup`, `/cloud`, `/chat`, and `/runs`.
 - Hosted page browser check: passed at `/cloud`.
 - Hosted pairing API disabled-by-default check: passed.
 - Private-name content search: no matches.
@@ -29,8 +31,5 @@ Status: local inspection build, not published.
 
 ## Remaining Before Publish
 
-- Inspect the app locally in a browser.
-- Review the repo tree manually.
-- Replace placeholder GitHub URLs in `package.json`.
-- Decide whether to keep or replace the generic code-of-conduct contact language.
+- Add GitHub repository URLs after choosing the publishing account or organization.
 - Create the public GitHub repo only after manual approval.
