@@ -4,6 +4,14 @@
   "private": true,
   "description": "Self-hosted dashboard for running multiple Codex and Claude Code projects from your phone or any browser.",
   "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bouttheb/praxia-core.git"
+  },
+  "homepage": "https://github.com/bouttheb/praxia-core#readme",
+  "bugs": {
+    "url": "https://github.com/bouttheb/praxia-core/issues"
+  },
   "scripts": {
     "dev": "next dev -p 3030",
     "build": "next build",

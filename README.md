@@ -29,7 +29,7 @@ and help me add my first projects by local repo path.
 ```
 
 ```bash
-git clone <praxia-core-repo-url>
+git clone https://github.com/bouttheb/praxia-core.git
 cd praxia-core
 npm install
 npm run install:local
