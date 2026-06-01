@@ -1,0 +1,79 @@
+# Praxia Core
+
+Praxia Core is a self-hosted dashboard for people managing too many AI coding
+projects at once.
+
+It gives you one place to see every project, read its current README/vision
+snapshot, check the latest progress, and queue work for a local machine running
+Codex or Claude Code. The phone or browser is the remote control; your paired
+computer does the actual work in the local repo.
+
+## What It Does
+
+- Track projects across areas such as Open Source, Client Work, or Personal.
+- Store each project's working directory, default agent, progress, and latest update.
+- Sync project docs from `docs/VISION.md`, `VISION.md`, `README.md`, and architecture docs.
+- Queue commands from a web dashboard.
+- Let a local daemon claim commands and run `claude -p` or `codex exec`.
+- Report results, blockers, failures, and completed work back to the dashboard.
+
+## Quick Start
+
+```bash
+git clone https://github.com/your-org/praxia-core.git
+cd praxia-core
+npm install
+cp .env.example .env.local
+```
+
+Fill in `DATABASE_URL` and `DASHBOARD_WRITE_KEY`, then:
+
+```bash
+npm run db:init
+npm run db:seed
+npm run dev
+```
+
+Open <http://localhost:3030>.
+
+In another terminal, start the daemon:
+
+```bash
+mkdir -p ~/.praxia
+cp .env.local ~/.praxia/dashboard.env
+node daemon/dashboard-daemon.mjs
+```
+
+## Deployment Shape
+
+The web app can run anywhere Next.js and Postgres run. The daemon should run on
+the machine that has your project repos and your authenticated Codex / Claude
+Code CLIs.
+
+Common setups:
+
+- Laptop or desktop hosts both the dashboard and daemon.
+- Home server hosts the dashboard; workstation runs the daemon.
+- VPS hosts the dashboard; local machine reaches it through a private tunnel.
+
+## Security Notes
+
+Praxia Core can ask an agent to modify files in a local repo. Treat the daemon
+as a powerful local automation process.
+
+- Keep `DASHBOARD_WRITE_KEY` private.
+- Use a private network, VPN, or authenticated reverse proxy before exposing the app.
+- Only add project directories you trust.
+- Review queued commands before running unattended automation.
+- Do not commit `.env.local` or `~/.praxia/dashboard.env`.
+
+## Public Scrub
+
+This repo is intended to be a generic shell. Before publishing a fork, run:
+
+```bash
+npm run audit:private-names
+npm run audit:secrets
+```
+
+Also inspect screenshots manually before adding them to a public repo.

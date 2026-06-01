@@ -1,0 +1,43 @@
+{
+  "name": "praxia-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-hosted AI project dashboard for running Codex and Claude Code projects from your phone.",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/praxia-core.git"
+  },
+  "homepage": "https://github.com/your-org/praxia-core#readme",
+  "bugs": {
+    "url": "https://github.com/your-org/praxia-core/issues"
+  },
+  "scripts": {
+    "dev": "next dev -p 3030",
+    "build": "next build",
+    "start": "next start -p 3030",
+    "db:init": "tsx scripts/init-db.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "audit:private-names": "echo \"Run your own private-name rg command before publishing.\"",
+    "audit:secrets": "rg -i \"api[_-]?key|secret|token|password|database_url\" . --glob '!node_modules/**' --glob '!.next/**' --glob '!package-lock.json' || true"
+  },
+  "dependencies": {
+    "next": "15.5.18",
+    "postgres": "3.4.5",
+    "react": "19.0.5",
+    "react-dom": "19.0.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.16",
+    "@types/node": "22.10.5",
+    "@types/react": "19.0.4",
+    "@types/react-dom": "19.0.2",
+    "dotenv": "17.0.0",
+    "tailwindcss": "4.1.16",
+    "tsx": "4.22.0",
+    "typescript": "5.7.3"
+  },
+  "overrides": {
+    "postcss": "8.5.12"
+  }
+}
