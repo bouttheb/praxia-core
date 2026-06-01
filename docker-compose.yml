@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: praxia-core-postgres
+    environment:
+      POSTGRES_USER: praxia
+      POSTGRES_PASSWORD: praxia
+      POSTGRES_DB: praxia
+    ports:
+      - "5432:5432"
+    volumes:
+      - praxia-core-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U praxia -d praxia"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  praxia-core-postgres:

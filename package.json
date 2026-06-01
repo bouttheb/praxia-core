@@ -17,8 +17,11 @@
     "build": "next build",
     "start": "next start -p 3030",
     "install:local": "node scripts/install-local.mjs",
+    "db:up": "docker compose up -d postgres",
     "db:init": "tsx scripts/init-db.ts",
     "db:seed": "tsx scripts/seed.ts",
+    "scan:projects": "tsx scripts/scan-projects.ts",
+    "smoke:self-hosted": "tsx scripts/smoke-self-hosted.ts",
     "audit:private-names": "echo \"Run your own private-name rg command before publishing.\"",
     "audit:secrets": "rg -i \"api[_-]?key|secret|token|password|database_url\" . --glob '!node_modules/**' --glob '!.next/**' --glob '!package-lock.json' || true"
   },

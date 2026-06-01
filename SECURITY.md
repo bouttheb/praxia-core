@@ -10,6 +10,9 @@ your local network.
 - `DASHBOARD_WRITE_KEY` belongs in `.env.local` and `~/.praxia/dashboard.env`.
 - `COMMAND_KEY` is optional. If set, browser/API command creation requires it.
 
+Set `COMMAND_KEY` before exposing command creation beyond localhost. Without
+it, anyone who can reach your dashboard can queue commands through the API.
+
 Never commit `.env.local`, `.env`, or `~/.praxia/dashboard.env`.
 
 ## Daemon

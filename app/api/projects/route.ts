@@ -28,21 +28,17 @@ export async function POST(req: Request) {
   const workingDirectory = typeof body?.workingDirectory === "string" ? body.workingDirectory.trim() || null : null;
   const agent = body?.agent === "codex" ? "codex" : "claude";
 
-  const [area] = await sql<{ id: number }[]>`
-    INSERT INTO areas (name, sort_order)
-    VALUES (
-      ${areaName},
-      COALESCE((SELECT MAX(sort_order) + 1 FROM areas), 0)
-    )
-    ON CONFLICT DO NOTHING
-    RETURNING id
+  const [existingArea] = await sql<{ id: number }[]>`
+    SELECT id FROM areas WHERE name = ${areaName} ORDER BY id LIMIT 1
   `;
 
   const areaId =
-    area?.id ??
+    existingArea?.id ??
     (
       await sql<{ id: number }[]>`
-        SELECT id FROM areas WHERE name = ${areaName} ORDER BY id LIMIT 1
+        INSERT INTO areas (name, sort_order)
+        VALUES (${areaName}, COALESCE((SELECT MAX(sort_order) + 1 FROM areas), 0))
+        RETURNING id
       `
     )[0]?.id;
 

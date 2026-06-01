@@ -1,14 +1,15 @@
 import { AppShell } from "@/components/AppShell";
 import { ProjectCreateForm } from "@/components/ProjectCreateForm";
+import { ProjectImportPanel } from "@/components/ProjectImportPanel";
 import { loadDaemonHeartbeats } from "@/lib/dashboard-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function SetupPage() {
-  const heartbeats = await loadDaemonHeartbeats().catch(() => []);
+  const heartbeats = await withTimeout(loadDaemonHeartbeats(), 1200, []).catch(() => []);
 
   return (
-    <AppShell>
+    <AppShell loadNavAreas={false}>
       <main className="flex-1 min-w-0 overflow-y-auto cockpit-scroll">
         <div className="px-6 lg:px-10 py-8 max-w-[1100px] mx-auto">
           <header className="mb-8">
@@ -23,16 +24,36 @@ export default async function SetupPage() {
             <div className="space-y-5">
               <AgentInstallCard />
               <SetupSteps />
+              <ProjectImportPanel />
               <ProjectCreateForm />
             </div>
             <aside className="space-y-5">
+              <LocalDatabaseCard />
               <DaemonConnectionCard heartbeats={heartbeats} />
               <ProjectOnboardingCard />
+              <SecurityCard />
             </aside>
           </div>
         </div>
       </main>
     </AppShell>
+  );
+}
+
+function LocalDatabaseCard() {
+  return (
+    <section className="surface-solid p-5">
+      <div className="eyebrow">Database</div>
+      <h2 className="serif text-2xl mt-2">Local Docker default</h2>
+      <p className="mt-2 text-sm" style={{ color: "var(--color-ink-mute)" }}>
+        No hosted database account is required for local self-hosting. The installer points DATABASE_URL at Docker Postgres unless you replace it.
+      </p>
+      <div className="mt-4 rounded-[14px] p-3" style={{ border: "1px solid var(--color-line)", background: "var(--color-bg-sunken)" }}>
+        <code className="text-xs whitespace-pre-wrap">{`npm run db:up
+npm run db:init
+npm run smoke:self-hosted`}</code>
+      </div>
+    </section>
   );
 }
 
@@ -59,8 +80,8 @@ function SetupSteps() {
         <StepCard
           number="1"
           title="Prepare config"
-          body="The helper writes .env.local and ~/.praxia/dashboard.env, generating a daemon key automatically."
-          command="npm run install:local"
+          body="The helper writes .env.local and ~/.praxia/dashboard.env, generating a daemon key and local Docker database URL."
+          command="npm run install:local && npm run db:up"
         />
         <StepCard
           number="2"
@@ -166,6 +187,32 @@ function ProjectOnboardingCard() {
   );
 }
 
+function SecurityCard() {
+  return (
+    <section className="surface-solid p-5">
+      <div className="eyebrow">Exposure warning</div>
+      <p className="text-sm mt-2" style={{ color: "var(--color-ink-mute)" }}>
+        Keep Praxia local, behind a VPN, or behind an authenticated reverse proxy. Set COMMAND_KEY before exposing command creation beyond localhost.
+      </p>
+    </section>
+  );
+}
+
 function isFresh(iso: string) {
   return Date.now() - new Date(iso).getTime() < 90_000;
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(fallback), ms);
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch(() => {
+        clearTimeout(timer);
+        resolve(fallback);
+      });
+  });
 }

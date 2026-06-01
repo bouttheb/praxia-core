@@ -48,7 +48,7 @@ const dashboardUrl = ensure(
 const databaseUrl = ensure(process.env.DATABASE_URL || local.get("DATABASE_URL"), "");
 const daemonId = ensure(process.env.DAEMON_ID || daemon.get("DAEMON_ID"), hostname() || "local-machine");
 
-local.set("DATABASE_URL", databaseUrl);
+local.set("DATABASE_URL", databaseUrl || "postgres://praxia:praxia@localhost:5432/praxia");
 local.set("DASHBOARD_WRITE_KEY", writeKey);
 local.set("DASHBOARD_URL", dashboardUrl);
 if (!local.has("COMMAND_KEY")) local.set("COMMAND_KEY", "");
@@ -69,7 +69,9 @@ console.log(`- ${localEnvPath}`);
 console.log(`- ${daemonEnvPath}`);
 if (!databaseUrl) {
   console.log("");
-  console.log("DATABASE_URL is still blank. Add a Postgres connection string to .env.local, then run:");
+  console.log("No DATABASE_URL was found, so .env.local now points at the Docker Postgres default.");
+  console.log("Run:");
+  console.log("  docker compose up -d postgres");
   console.log("  npm run db:init");
 } else {
   console.log("");

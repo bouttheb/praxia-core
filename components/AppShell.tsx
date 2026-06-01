@@ -1,8 +1,14 @@
 import { LeftNav } from "@/components/LeftNav";
 import { loadAreas } from "@/lib/dashboard-data";
 
-export async function AppShell({ children }: { children: React.ReactNode }) {
-  const areas = await loadAreas().catch(() => []);
+export async function AppShell({
+  children,
+  loadNavAreas = true,
+}: {
+  children: React.ReactNode;
+  loadNavAreas?: boolean;
+}) {
+  const areas = loadNavAreas ? await loadAreas().catch(() => []) : [];
 
   return (
     <div className="h-[100dvh] overflow-hidden flex" style={{ background: "var(--color-bg)" }}>

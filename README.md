@@ -33,13 +33,18 @@ git clone https://github.com/your-org/praxia-core.git
 cd praxia-core
 npm install
 npm run install:local
+npm run db:up
 ```
 
-If `DATABASE_URL` is blank after the installer runs, add a Postgres connection
-string to `.env.local`, then:
+The default local path uses Docker Postgres at
+`postgres://praxia:praxia@localhost:5432/praxia`. To use Neon, Supabase, or
+another Postgres provider, replace `DATABASE_URL` in `.env.local`.
+If another local Postgres is already using port 5432, either stop it, change
+the Docker port, or use a hosted Postgres URL.
 
 ```bash
 npm run db:init
+npm run smoke:self-hosted
 npm run db:seed
 npm run dev
 ```
@@ -65,6 +70,9 @@ Open `/setup` and add one row per repo:
 - **Working directory**: the repo path as seen by the daemon machine.
 - **Default agent**: `claude` for Claude Code or `codex` for Codex.
 
+You can also use **Import projects** on `/setup` to scan a local folder for git
+repos and README/VISION docs, then import selected projects in one pass.
+
 After adding a project, open its details and use **Sync docs** to pull in
 `README.md`, `docs/VISION.md`, `VISION.md`, `ARCHITECTURE.md`, or
 `docs/ARCHITECTURE.md` when those files exist on the web app host. If your web
@@ -83,6 +91,8 @@ Common setups:
 - Laptop or desktop hosts both the dashboard and daemon.
 - Home server hosts the dashboard; workstation runs the daemon.
 - VPS hosts the dashboard; local machine reaches it through a private tunnel.
+
+For always-on daemon setup, see [docs/DAEMON_SERVICE.md](docs/DAEMON_SERVICE.md).
 
 ## Security Notes
 

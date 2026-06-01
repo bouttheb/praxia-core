@@ -7,10 +7,13 @@ The short version:
 ```bash
 npm install
 npm run install:local
+npm run db:up
 npm run db:init
+npm run smoke:self-hosted
 npm run dev
 node daemon/dashboard-daemon.mjs
 ```
 
-If `DATABASE_URL` is blank after `npm run install:local`, ask the user for a
-Postgres connection string before running `npm run db:init`.
+The default `DATABASE_URL` points at Docker Postgres. If Docker is unavailable
+or the user wants hosted Postgres, ask for a connection string before running
+`npm run db:init`.
