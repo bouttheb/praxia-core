@@ -94,6 +94,17 @@ Common setups:
 
 For always-on daemon setup, see [docs/DAEMON_SERVICE.md](docs/DAEMON_SERVICE.md).
 
+## Hosted Mode
+
+This repo also includes the first Praxia Cloud blueprint for a managed hosted
+version. Hosted mode is off by default; self-hosted installs do not need hosted
+accounts, billing, or cloud database credentials.
+
+Inspect the plan at `/cloud` or read [docs/CLOUD_MODE.md](docs/CLOUD_MODE.md).
+The hosted layer adds accounts, organizations, daemon device pairing, audit
+events, and billing boundaries while keeping command execution on the user's own
+machine through an outbound-only daemon.
+
 ## Security Notes
 
 Praxia Core can ask an agent to modify files in a local repo. Treat the daemon

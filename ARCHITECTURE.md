@@ -16,13 +16,17 @@ Browser or phone -> Next.js app -> Postgres <- daemon -> local repo -> Codex/Cla
 
 ## Data Model
 
-- `organizations`: optional top-level owner for future team mode.
+- `organizations`: top-level owner for local or hosted workspaces.
+- `accounts` and `organization_memberships`: hosted user and workspace boundary.
 - `areas`: project groups.
 - `projects`: project metadata, agent choice, working directory, docs snapshot.
 - `updates`: progress log entries.
 - `commands`: queue rows claimed by the daemon.
 - `settings`: small key/value store for future local preferences.
 - `daemon_heartbeats`: recent daemon check-ins so setup can show connected machines.
+- `daemon_devices` and `daemon_pairing_codes`: hosted device pairing scaffold.
+- `audit_events`: hosted audit trail for pairing, command, and admin actions.
+- `subscriptions`: hosted billing boundary.
 
 ## Dispatch Flow
 
@@ -36,3 +40,17 @@ Browser or phone -> Next.js app -> Postgres <- daemon -> local repo -> Codex/Cla
 
 The daemon also calls `POST /api/daemon/heartbeat` during its polling loop so
 the setup page can show whether a local runner has connected recently.
+
+## Hosted Mode
+
+Hosted Praxia keeps the same outbound daemon architecture. The cloud app should
+never need inbound network access to a user's computer:
+
+```text
+Browser -> Praxia Cloud -> hosted Postgres <- daemon polling from user's machine
+```
+
+Cloud mode is disabled by default with `PRAXIA_MODE=self-hosted`. A hosted
+deployment can set `PRAXIA_MODE=cloud` after auth, workspace scoping, rate
+limits, and revocable daemon tokens are in place. See
+[docs/CLOUD_MODE.md](docs/CLOUD_MODE.md).

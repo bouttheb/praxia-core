@@ -10,6 +10,7 @@ Status: local inspection build, not published.
 - Added `AGENTS.md`, `CLAUDE.md`, and `npm run install:local` so Codex/Claude can follow a concrete install path.
 - Added Docker Postgres, folder scanning, and project import so self-hosted users can try Praxia without a hosted database account.
 - Added a self-hosted smoke test and daemon service docs for macOS/Linux/manual Windows.
+- Added a hosted-mode planning page, cloud schema scaffold, and disabled-by-default pairing API routes for future Praxia Cloud work.
 - Removed customer-specific routes, fixtures, screenshots, docs, and business workflows from the public shell.
 - Replaced seed data with neutral example projects.
 - Replaced public docs with generic Praxia Core positioning.
@@ -18,6 +19,8 @@ Status: local inspection build, not published.
 ## Checks
 
 - Production build: passed.
+- Hosted page browser check: passed at `/cloud`.
+- Hosted pairing API disabled-by-default check: passed.
 - Private-name content search: no matches.
 - Private-name filename search: no matches.
 - Secret keyword search: only expected references in docs, environment examples, and redaction/security helper code.
