@@ -17,6 +17,19 @@ does the actual work in the local repo.
 - Let a local daemon claim commands and run `claude -p` or `codex exec`.
 - Report results, blockers, failures, and completed work back to the dashboard.
 
+## How Praxia Is Different
+
+Some tools focus on controlling or observing live AI coding sessions. Praxia
+focuses on the project layer above those sessions.
+
+Use Praxia when the hard part is not one terminal tab, but keeping track of many
+projects, many agent runs, and the context needed to continue each one. Each
+project gets a home for its docs, status, working directory, default agent,
+queued commands, and run history.
+
+Codex and Claude Code are the workers. Praxia is the command center that helps
+you decide what should happen next across the whole portfolio.
+
 ## Quick Start
 
 If you are asking Codex or Claude Code to install this repo for you, give it
