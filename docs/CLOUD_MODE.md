@@ -18,11 +18,26 @@ Praxia Cloud adds managed infrastructure:
 
 - hosted Postgres
 - user accounts and organizations
+- sessions, email verification, and workspace invites
 - short-lived daemon pairing codes
 - revocable device tokens
 - audit logs
 - billing and usage limits
 - guided AI onboarding
+
+## Pricing Hypothesis
+
+Praxia Cloud sells the command center, not AI compute. Users bring their own
+local Codex and Claude Code accounts.
+
+| Plan | Price | Projects | Runs/mo | Machines | Members |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Free | $0 | 3 | 25 | 1 | 1 |
+| Builder | $29/mo | 12 | 500 | 1 | 1 |
+| Pro | $59/mo | 36 | 1,000 | 3 | 3 |
+| Studio | $129/mo | 100 | 3,000 | 5 | 5 |
+
+These limits should be enforced server-side before billing goes live.
 
 ## First Hosted Milestone
 
@@ -66,6 +81,22 @@ but hosted routes must enforce:
 - command belongs to a project in the organization
 - daemon device belongs to the organization
 - audit event written for privileged actions
+- plan limits checked before project, machine, and run creation
+
+## Signup and Billing Model
+
+Hosted signup should create:
+
+1. `accounts` row
+2. verified email or pending email verification token
+3. `organizations` row
+4. owner `organization_memberships` row
+5. `subscriptions` row with the chosen plan
+6. first `organization_usage_periods` row
+7. daemon pairing code after payment or free-plan activation
+
+Billing webhooks should write `checkout_events` first, then update
+`subscriptions`, `organizations.plan`, and `organizations.billing_status`.
 
 ## Guided AI Onboarding
 

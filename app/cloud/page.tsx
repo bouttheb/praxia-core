@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { CloudPricingTable } from "@/components/cloud/CloudPricingTable";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +46,11 @@ export default function CloudPage() {
             <p className="mt-2 text-sm max-w-2xl" style={{ color: "var(--color-ink-mute)" }}>
               The hosted product keeps the same local daemon model, but Praxia provides auth, Postgres, pairing, audit logs, billing, and the guided onboarding assistant.
             </p>
+            <div className="mt-4 flex gap-2 flex-wrap">
+              <Link href="/cloud/pricing" className="btn btn-primary">Pricing</Link>
+              <Link href="/cloud/signup?plan=builder" className="btn">Signup shell</Link>
+              <Link href="/cloud/login" className="btn">Login shell</Link>
+            </div>
           </header>
 
           <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-5">
@@ -61,6 +68,14 @@ export default function CloudPage() {
                     </div>
                   ))}
                 </div>
+              </section>
+
+              <section>
+                <div className="mb-3">
+                  <div className="eyebrow">Pricing hypothesis</div>
+                  <h2 className="serif text-2xl mt-2">Plans and limits</h2>
+                </div>
+                <CloudPricingTable compact />
               </section>
 
               <section className="surface-solid p-5">
@@ -102,7 +117,7 @@ export default function CloudPage() {
               <section className="surface-solid p-5">
                 <div className="eyebrow">Current scaffold</div>
                 <ul className="mt-4 space-y-3 text-sm" style={{ color: "var(--color-ink-mute)" }}>
-                  <li><strong style={{ color: "var(--color-ink)" }}>Schema:</strong> accounts, memberships, devices, pairing codes, subscriptions, audit events.</li>
+                  <li><strong style={{ color: "var(--color-ink)" }}>Schema:</strong> accounts, sessions, invites, usage, devices, pairing codes, subscriptions, audit events.</li>
                   <li><strong style={{ color: "var(--color-ink)" }}>API:</strong> disabled-by-default pairing creation and completion endpoints.</li>
                   <li><strong style={{ color: "var(--color-ink)" }}>Docs:</strong> hosted architecture, milestones, and acceptance gates.</li>
                 </ul>

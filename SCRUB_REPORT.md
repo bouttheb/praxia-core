@@ -31,4 +31,5 @@ Status: local inspection build, not published.
 
 ## Remaining Before Publish
 
+- Add public GitHub repository URLs after choosing the final public account or organization.
 - Create the public GitHub repo only after manual approval.

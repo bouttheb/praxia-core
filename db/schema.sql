@@ -29,6 +29,45 @@ CREATE TABLE IF NOT EXISTS accounts (
 CREATE UNIQUE INDEX IF NOT EXISTS accounts_email_unique ON accounts(LOWER(email));
 CREATE UNIQUE INDEX IF NOT EXISTS accounts_external_auth_unique ON accounts(external_auth_id) WHERE external_auth_id IS NOT NULL;
 
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'organizations_owner_account_fk'
+  ) THEN
+    ALTER TABLE organizations
+      ADD CONSTRAINT organizations_owner_account_fk
+      FOREIGN KEY (owner_account_id) REFERENCES accounts(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS account_sessions (
+  id SERIAL PRIMARY KEY,
+  account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL,
+  user_agent TEXT,
+  ip_hash TEXT,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  revoked_at TIMESTAMPTZ
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS account_sessions_token_hash_unique ON account_sessions(token_hash);
+CREATE INDEX IF NOT EXISTS account_sessions_account_idx ON account_sessions(account_id, expires_at DESC);
+
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
+  id SERIAL PRIMARY KEY,
+  account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  token_hash TEXT NOT NULL,
+  purpose TEXT NOT NULL DEFAULT 'login' CHECK (purpose IN ('signup', 'login', 'email_change')),
+  expires_at TIMESTAMPTZ NOT NULL,
+  consumed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS email_verification_tokens_hash_unique ON email_verification_tokens(token_hash);
+CREATE INDEX IF NOT EXISTS email_verification_tokens_email_idx ON email_verification_tokens(LOWER(email), purpose, expires_at);
+
 CREATE TABLE IF NOT EXISTS organization_memberships (
   id SERIAL PRIMARY KEY,
   organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
@@ -39,6 +78,21 @@ CREATE TABLE IF NOT EXISTS organization_memberships (
 );
 
 CREATE INDEX IF NOT EXISTS organization_memberships_account_idx ON organization_memberships(account_id);
+
+CREATE TABLE IF NOT EXISTS organization_invites (
+  id SERIAL PRIMARY KEY,
+  organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  invited_by_account_id INTEGER REFERENCES accounts(id) ON DELETE SET NULL,
+  email TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member', 'viewer')),
+  token_hash TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  accepted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS organization_invites_token_hash_unique ON organization_invites(token_hash);
+CREATE INDEX IF NOT EXISTS organization_invites_org_idx ON organization_invites(organization_id, accepted_at, expires_at);
 
 CREATE TABLE IF NOT EXISTS areas (
   id SERIAL PRIMARY KEY,
@@ -68,6 +122,7 @@ CREATE TABLE IF NOT EXISTS projects (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS created_by_account_id INTEGER REFERENCES accounts(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS projects_area_idx ON projects(area_id, sort_order);
 CREATE INDEX IF NOT EXISTS projects_required_daemon_idx ON projects(required_daemon_id) WHERE required_daemon_id IS NOT NULL;
 
@@ -104,8 +159,11 @@ CREATE TABLE IF NOT EXISTS commands (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE commands ADD COLUMN IF NOT EXISTS organization_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE;
+ALTER TABLE commands ADD COLUMN IF NOT EXISTS created_by_account_id INTEGER REFERENCES accounts(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS commands_status_idx ON commands(status, created_at);
 CREATE INDEX IF NOT EXISTS commands_project_idx ON commands(project_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS commands_org_idx ON commands(organization_id, created_at DESC) WHERE organization_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS daemon_heartbeats (
   daemon_id TEXT PRIMARY KEY,
@@ -130,6 +188,8 @@ CREATE TABLE IF NOT EXISTS daemon_devices (
 
 CREATE UNIQUE INDEX IF NOT EXISTS daemon_devices_token_hash_unique ON daemon_devices(token_hash);
 CREATE INDEX IF NOT EXISTS daemon_devices_org_idx ON daemon_devices(organization_id, status);
+
+ALTER TABLE commands ADD COLUMN IF NOT EXISTS daemon_device_id INTEGER REFERENCES daemon_devices(id) ON DELETE SET NULL;
 
 CREATE TABLE IF NOT EXISTS daemon_pairing_codes (
   id SERIAL PRIMARY KEY,
@@ -160,6 +220,34 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS subscriptions_org_unique ON subscriptions(organization_id);
+
+CREATE TABLE IF NOT EXISTS organization_usage_periods (
+  id SERIAL PRIMARY KEY,
+  organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  period_start DATE NOT NULL,
+  plan TEXT NOT NULL DEFAULT 'free',
+  runs_used INTEGER NOT NULL DEFAULT 0 CHECK (runs_used >= 0),
+  projects_used INTEGER NOT NULL DEFAULT 0 CHECK (projects_used >= 0),
+  machines_used INTEGER NOT NULL DEFAULT 0 CHECK (machines_used >= 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (organization_id, period_start)
+);
+
+CREATE INDEX IF NOT EXISTS organization_usage_periods_org_idx ON organization_usage_periods(organization_id, period_start DESC);
+
+CREATE TABLE IF NOT EXISTS checkout_events (
+  id SERIAL PRIMARY KEY,
+  organization_id INTEGER REFERENCES organizations(id) ON DELETE SET NULL,
+  provider TEXT NOT NULL DEFAULT 'stripe',
+  provider_event_id TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  received_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  processed_at TIMESTAMPTZ
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS checkout_events_provider_event_unique ON checkout_events(provider, provider_event_id);
 
 CREATE TABLE IF NOT EXISTS audit_events (
   id SERIAL PRIMARY KEY,
