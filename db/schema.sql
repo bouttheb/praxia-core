@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS projects (
   hidden BOOLEAN NOT NULL DEFAULT FALSE,
   working_directory TEXT,
   vision_md TEXT,
-  agent TEXT NOT NULL DEFAULT 'claude' CHECK (agent IN ('claude', 'codex')),
-  fallback_agent TEXT CHECK (fallback_agent IN ('claude', 'codex')),
+  agent TEXT NOT NULL DEFAULT 'claude' CHECK (agent IN ('claude', 'codex', 'gemini', 'opencode', 'goose')),
+  fallback_agent TEXT CHECK (fallback_agent IN ('claude', 'codex', 'gemini', 'opencode', 'goose')),
   required_daemon_id TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS commands (
   body TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'queued'
     CHECK (status IN ('queued', 'running', 'completed', 'failed', 'blocked', 'needs_input', 'cancelled')),
-  agent TEXT NOT NULL DEFAULT 'claude' CHECK (agent IN ('claude', 'codex')),
+  agent TEXT NOT NULL DEFAULT 'claude' CHECK (agent IN ('claude', 'codex', 'gemini', 'opencode', 'goose')),
   working_dir TEXT,
   result TEXT,
   error TEXT,

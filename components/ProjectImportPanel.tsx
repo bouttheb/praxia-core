@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { agentOptions, type AgentKey } from "@/lib/agents";
 
 type Candidate = {
   name: string;
@@ -15,7 +16,7 @@ export function ProjectImportPanel() {
   const router = useRouter();
   const [root, setRoot] = useState("~/code");
   const [areaName, setAreaName] = useState("Imported Projects");
-  const [agent, setAgent] = useState<"claude" | "codex">("claude");
+  const [agent, setAgent] = useState<AgentKey>("claude");
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [status, setStatus] = useState<"idle" | "scanning" | "importing" | "done" | "error">("idle");
@@ -88,9 +89,12 @@ export function ProjectImportPanel() {
       <div className="grid md:grid-cols-[minmax(0,1fr)_180px_140px] gap-3 mt-4">
         <input className="input w-full font-mono text-sm" value={root} onChange={(event) => setRoot(event.target.value)} />
         <input className="input w-full" value={areaName} onChange={(event) => setAreaName(event.target.value)} />
-        <select className="input w-full" value={agent} onChange={(event) => setAgent(event.target.value as "claude" | "codex")}>
-          <option value="claude">Claude Code</option>
-          <option value="codex">Codex</option>
+        <select className="input w-full" value={agent} onChange={(event) => setAgent(event.target.value as AgentKey)}>
+          {agentOptions.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
       <div className="mt-3 flex gap-2 flex-wrap">

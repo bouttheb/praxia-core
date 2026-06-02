@@ -2,7 +2,7 @@
 
 Praxia Cloud is the hosted layer on top of Praxia Core. The hosted product should
 keep the local-runner model: the web app coordinates work, while the user's own
-machine runs Codex or Claude Code against local repos.
+machine runs the selected local AI coding agent against local repos.
 
 ## Product Boundary
 

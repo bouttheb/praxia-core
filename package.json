@@ -2,7 +2,7 @@
   "name": "praxia-core",
   "version": "0.1.0",
   "private": true,
-  "description": "Self-hosted dashboard for running multiple Codex and Claude Code projects from your phone or any browser.",
+  "description": "Self-hosted dashboard for managing multiple AI coding projects across local agents.",
   "license": "AGPL-3.0",
   "scripts": {
     "dev": "next dev -p 3030",

@@ -58,6 +58,9 @@ daemon.set("DASHBOARD_WRITE_KEY", writeKey);
 daemon.set("DAEMON_ID", daemonId);
 daemon.set("CLAUDE_BIN", ensure(process.env.CLAUDE_BIN || daemon.get("CLAUDE_BIN"), "claude"));
 daemon.set("CODEX_BIN", ensure(process.env.CODEX_BIN || daemon.get("CODEX_BIN"), "codex"));
+daemon.set("GEMINI_BIN", ensure(process.env.GEMINI_BIN || daemon.get("GEMINI_BIN"), "gemini"));
+daemon.set("OPENCODE_BIN", ensure(process.env.OPENCODE_BIN || daemon.get("OPENCODE_BIN"), "opencode"));
+daemon.set("GOOSE_BIN", ensure(process.env.GOOSE_BIN || daemon.get("GOOSE_BIN"), "goose"));
 daemon.set("DAEMON_POLL_INTERVAL_MS", ensure(process.env.DAEMON_POLL_INTERVAL_MS || daemon.get("DAEMON_POLL_INTERVAL_MS"), "5000"));
 
 mkdirSync(dirname(daemonEnvPath), { recursive: true });

@@ -1,12 +1,13 @@
 # Praxia Core
 
-Praxia Core is a self-hosted dashboard for running multiple Codex and Claude
-Code projects from your phone or any browser.
+Praxia Core is a self-hosted dashboard for managing multiple AI coding projects
+across local agents from your phone or any browser.
 
 It gives you one place to see every project, read its current README/vision
 snapshot, check the latest progress, and queue work for a local machine running
-Codex and Claude Code. Your browser is the remote control; your paired computer
-does the actual work in the local repo.
+Codex, Claude Code, Gemini CLI, OpenCode, Goose, or another future adapter.
+Your browser is the remote control; your paired computer does the actual work
+in the local repo.
 
 ## What It Does
 
@@ -14,7 +15,7 @@ does the actual work in the local repo.
 - Store each project's working directory, default agent, progress, and latest update.
 - Sync project docs from `docs/VISION.md`, `VISION.md`, `README.md`, and architecture docs.
 - Queue commands from a web dashboard.
-- Let a local daemon claim commands and run `claude -p` or `codex exec`.
+- Let a local daemon claim commands and run your selected local AI coding agent.
 - Report results, blockers, failures, and completed work back to the dashboard.
 
 ## How Praxia Is Different
@@ -27,13 +28,14 @@ projects, many agent runs, and the context needed to continue each one. Each
 project gets a home for its docs, status, working directory, default agent,
 queued commands, and run history.
 
-Codex and Claude Code are the workers. Praxia is the command center that helps
-you decide what should happen next across the whole portfolio.
+Codex, Claude Code, Gemini CLI, OpenCode, and Goose can be workers. Praxia is
+the command center that helps you decide what should happen next across the
+whole portfolio.
 
 ## Quick Start
 
-If you are asking Codex or Claude Code to install this repo for you, give it
-this prompt:
+If you are asking an AI coding agent to install this repo for you, give it this
+prompt:
 
 ```text
 Clone this Praxia Core repo, read AGENTS.md, run the local install steps,
@@ -74,6 +76,13 @@ node daemon/dashboard-daemon.mjs
 
 The setup page shows recent daemon heartbeats once the local runner connects.
 
+If you already initialized Praxia before the multi-agent adapters were added,
+apply the constraint migration once:
+
+```bash
+psql "$DATABASE_URL" -f db/migrations/001_expand_agent_adapters.sql
+```
+
 ## Onboarding Projects
 
 Open `/setup` and add one row per repo:
@@ -81,7 +90,7 @@ Open `/setup` and add one row per repo:
 - **Area**: a group such as Open Source, Client Work, or Personal Projects.
 - **Project name**: the display name on the dashboard.
 - **Working directory**: the repo path as seen by the daemon machine.
-- **Default agent**: `claude` for Claude Code or `codex` for Codex.
+- **Default agent**: choose Claude Code, Codex, Gemini CLI, OpenCode, or Goose.
 
 You can also use **Import projects** on `/setup` to scan a local folder for git
 repos and README/VISION docs, then import selected projects in one pass.

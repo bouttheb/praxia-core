@@ -2,12 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { agentOptions, type AgentKey } from "@/lib/agents";
 
 type ProjectOption = {
   id: number;
   name: string;
   area: string;
-  agent: "claude" | "codex";
+  agent: AgentKey;
 };
 
 export function CommandComposer({
@@ -22,7 +23,7 @@ export function CommandComposer({
   const router = useRouter();
   const [projectId, setProjectId] = useState(String(initialProjectId ?? projects[0]?.id ?? ""));
   const [body, setBody] = useState(initialPrompt ?? "");
-  const [agent, setAgent] = useState<"project" | "claude" | "codex">("project");
+  const [agent, setAgent] = useState<"project" | AgentKey>("project");
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -84,10 +85,13 @@ export function CommandComposer({
           <label className="block text-sm font-medium" htmlFor="agent">
             Agent
           </label>
-          <select id="agent" className="input w-full" value={agent} onChange={(event) => setAgent(event.target.value as "project" | "claude" | "codex")}>
+          <select id="agent" className="input w-full" value={agent} onChange={(event) => setAgent(event.target.value as "project" | AgentKey)}>
             <option value="project">Project default</option>
-            <option value="claude">Claude Code</option>
-            <option value="codex">Codex</option>
+            {agentOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label}
+              </option>
+            ))}
           </select>
 
           <button type="button" onClick={submit} disabled={!projectId || !body.trim() || status === "submitting"} className="btn btn-primary w-full">

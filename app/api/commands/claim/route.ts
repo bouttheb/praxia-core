@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireDaemonKey } from "@/lib/security";
+import type { AgentKey } from "@/lib/agents";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
       project_id: number;
       project_name: string;
       body: string;
-      agent: "claude" | "codex";
+      agent: AgentKey;
       working_dir: string | null;
     }[]
   >`

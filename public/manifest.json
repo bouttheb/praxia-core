@@ -1,7 +1,7 @@
 {
   "name": "Praxia Core",
   "short_name": "Praxia",
-  "description": "Self-hosted dashboard for running multiple Codex and Claude Code projects from your phone or any browser.",
+  "description": "Self-hosted dashboard for managing multiple AI coding projects across local agents.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F7F7F5",

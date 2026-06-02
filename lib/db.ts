@@ -1,4 +1,5 @@
 import postgres from "postgres";
+import type { AgentKey } from "@/lib/agents";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -40,8 +41,8 @@ export type Project = {
   hidden: boolean;
   working_directory: string | null;
   vision_md: string | null;
-  agent: "claude" | "codex";
-  fallback_agent: "claude" | "codex" | null;
+  agent: AgentKey;
+  fallback_agent: AgentKey | null;
   required_daemon_id: string | null;
   updated_at: string;
 };
@@ -84,7 +85,7 @@ export type CommandRow = {
   project_name: string;
   body: string;
   status: CommandStatus;
-  agent: "claude" | "codex";
+  agent: AgentKey;
   working_dir: string | null;
   result: string | null;
   error: string | null;

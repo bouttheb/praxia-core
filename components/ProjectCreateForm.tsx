@@ -3,6 +3,7 @@
 import type React from "react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { agentOptions, type AgentKey } from "@/lib/agents";
 
 export function ProjectCreateForm() {
   const router = useRouter();
@@ -10,7 +11,7 @@ export function ProjectCreateForm() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [workingDirectory, setWorkingDirectory] = useState("");
-  const [agent, setAgent] = useState<"claude" | "codex">("claude");
+  const [agent, setAgent] = useState<AgentKey>("claude");
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -64,9 +65,12 @@ export function ProjectCreateForm() {
       </label>
       <label className="block text-sm font-medium">
         Default agent
-        <select className="input mt-2 w-full" value={agent} onChange={(event) => setAgent(event.target.value as "claude" | "codex")}>
-          <option value="claude">Claude Code</option>
-          <option value="codex">Codex</option>
+        <select className="input mt-2 w-full" value={agent} onChange={(event) => setAgent(event.target.value as AgentKey)}>
+          {agentOptions.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </label>
       <button className="btn btn-primary" type="submit" disabled={status === "submitting"}>

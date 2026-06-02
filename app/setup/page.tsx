@@ -16,7 +16,7 @@ export default async function SetupPage() {
             <div className="eyebrow">Setup</div>
             <h1 className="serif text-4xl mt-2">Connect your machine</h1>
             <p className="mt-2 text-sm" style={{ color: "var(--color-ink-mute)" }}>
-              Give the repo to Codex or Claude Code, ask it to read AGENTS.md, then use this page to confirm the daemon and add projects.
+              Give the repo to your AI coding agent, ask it to read AGENTS.md, then use this page to confirm the daemon and add projects.
             </p>
           </header>
 
@@ -61,7 +61,7 @@ function AgentInstallCard() {
   return (
     <section className="surface-solid p-5">
       <div className="eyebrow">AI-assisted install</div>
-      <h2 className="serif text-2xl mt-2">What to tell Codex or Claude Code</h2>
+      <h2 className="serif text-2xl mt-2">What to tell your coding agent</h2>
       <p className="mt-2 text-sm" style={{ color: "var(--color-ink-mute)" }}>
         The repo includes AGENTS.md and CLAUDE.md so an AI coding agent knows the install path. It can set up files and start processes, but it should ask you for a Postgres URL if one is missing.
       </p>
@@ -179,7 +179,7 @@ function ProjectOnboardingCard() {
       <ol className="mt-4 space-y-3 text-sm" style={{ color: "var(--color-ink-mute)" }}>
         <li><strong style={{ color: "var(--color-ink)" }}>Choose an area.</strong> Examples: Open Source, Client Work, Personal.</li>
         <li><strong style={{ color: "var(--color-ink)" }}>Add the repo path.</strong> Use the path as seen by the daemon machine.</li>
-        <li><strong style={{ color: "var(--color-ink)" }}>Pick an agent.</strong> Claude Code or Codex can be the project default.</li>
+        <li><strong style={{ color: "var(--color-ink)" }}>Pick an agent.</strong> Claude Code, Codex, Gemini CLI, OpenCode, or Goose can be the project default.</li>
         <li><strong style={{ color: "var(--color-ink)" }}>Sync docs.</strong> Praxia reads README, VISION, and ARCHITECTURE files when available.</li>
         <li><strong style={{ color: "var(--color-ink)" }}>Queue a command.</strong> The daemon receives it and runs in that folder.</li>
       </ol>

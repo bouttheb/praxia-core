@@ -1,5 +1,6 @@
 import { config as loadEnv } from "dotenv";
 import postgres from "postgres";
+import type { AgentKey } from "@/lib/agents";
 
 loadEnv({ path: ".env.local" });
 loadEnv();
@@ -8,7 +9,7 @@ type SeedProject = {
   name: string;
   description: string;
   completion: number;
-  agent: "claude" | "codex";
+  agent: AgentKey;
   workingDirectory: string;
   today: string;
   tomorrow: string;

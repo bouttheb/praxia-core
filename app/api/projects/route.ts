@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { loadAreas } from "@/lib/dashboard-data";
 import { sql } from "@/lib/db";
 import { requireCommandKeyIfConfigured } from "@/lib/security";
+import { parseAgentKey } from "@/lib/agents";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
   if (!name) return NextResponse.json({ error: "project name required" }, { status: 400 });
   const description = typeof body?.description === "string" ? body.description.trim() || null : null;
   const workingDirectory = typeof body?.workingDirectory === "string" ? body.workingDirectory.trim() || null : null;
-  const agent = body?.agent === "codex" ? "codex" : "claude";
+  const agent = parseAgentKey(body?.agent);
 
   const [existingArea] = await sql<{ id: number }[]>`
     SELECT id FROM areas WHERE name = ${areaName} ORDER BY id LIMIT 1

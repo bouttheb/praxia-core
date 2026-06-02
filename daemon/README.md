@@ -2,7 +2,7 @@
 
 The daemon connects a Praxia Core dashboard to the machine that actually has
 your project repos. It polls the dashboard for queued commands, claims one,
-runs either Claude Code or Codex in the project's configured working directory,
+runs the configured local AI coding agent in the project's working directory,
 then posts the result back.
 
 ## Configure
@@ -17,8 +17,19 @@ DASHBOARD_WRITE_KEY=replace-with-the-same-value-from-.env.local
 DAEMON_ID=home-machine
 CLAUDE_BIN=claude
 CODEX_BIN=codex
+GEMINI_BIN=gemini
+OPENCODE_BIN=opencode
+GOOSE_BIN=goose
 EOF
 ```
+
+Built-in agent adapters:
+
+- `claude`: `claude -p --permission-mode bypassPermissions <prompt>`
+- `codex`: `codex exec --full-auto <prompt>`
+- `gemini`: `gemini -p <prompt>`
+- `opencode`: `opencode run <prompt>`
+- `goose`: `goose run -t <prompt>`
 
 ## Run
 

@@ -1,4 +1,5 @@
 import { sql, type AreaWithProjects, type CommandRow } from "@/lib/db";
+import type { AgentKey } from "@/lib/agents";
 
 function demoAreas(): AreaWithProjects[] {
   const now = new Date().toISOString();
@@ -115,8 +116,8 @@ export async function loadAreas(): Promise<AreaWithProjects[]> {
       project_hidden: boolean | null;
       working_directory: string | null;
       vision_md: string | null;
-      agent: "claude" | "codex" | null;
-      fallback_agent: "claude" | "codex" | null;
+      agent: AgentKey | null;
+      fallback_agent: AgentKey | null;
       required_daemon_id: string | null;
       project_updated_at: string | null;
       latest_id: number | null;

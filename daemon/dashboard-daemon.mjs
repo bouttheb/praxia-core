@@ -3,6 +3,7 @@ import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
+import { commandForAgent } from "./agent-adapters.mjs";
 
 const envPath = join(homedir(), ".praxia", "dashboard.env");
 loadEnvFile(envPath);
@@ -11,8 +12,6 @@ const DASHBOARD_URL = process.env.DASHBOARD_URL || "http://localhost:3030";
 const DASHBOARD_WRITE_KEY = process.env.DASHBOARD_WRITE_KEY;
 const DAEMON_ID = process.env.DAEMON_ID || "local-daemon";
 const POLL_INTERVAL_MS = Number(process.env.DAEMON_POLL_INTERVAL_MS || 5000);
-const CLAUDE_BIN = process.env.CLAUDE_BIN || "claude";
-const CODEX_BIN = process.env.CODEX_BIN || "codex";
 const VERSION = "praxia-core-daemon-v0";
 
 if (!DASHBOARD_WRITE_KEY) {
@@ -64,11 +63,6 @@ function resolveWorkingDir(value) {
   if (!existsSync(absolute)) return { ok: false, reason: `Working directory does not exist: ${absolute}` };
   const real = realpathSync(absolute);
   return { ok: true, path: real };
-}
-
-function commandForAgent(agent, body) {
-  if (agent === "codex") return { bin: CODEX_BIN, args: ["exec", "--full-auto", body] };
-  return { bin: CLAUDE_BIN, args: ["-p", "--permission-mode", "bypassPermissions", body] };
 }
 
 function runProcess({ agent, body, cwd }) {
