@@ -1,6 +1,6 @@
 # Scrub Report
 
-Status: local inspection build, not published.
+Status: final public-release inspection.
 
 ## Completed
 
@@ -31,4 +31,4 @@ Status: local inspection build, not published.
 
 ## Remaining Before Publish
 
-- Create the public GitHub repo only after manual approval.
+- Flip the private GitHub repo to public after final approval.
