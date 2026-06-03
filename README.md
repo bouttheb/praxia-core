@@ -11,6 +11,15 @@ Codex, Claude Code, Gemini CLI, OpenCode, Goose, or another future adapter.
 Your browser is the remote control; your paired computer does the actual work
 in the local repo.
 
+## Why Praxia
+
+The name Praxia comes from the Greek word _praxis_, meaning the practical
+application of knowledge. Most AI systems help you think. Praxia helps you act.
+
+It turns ideas into projects, projects into tasks, and tasks into completed
+outcomes. The goal is not simply artificial intelligence. It is applied
+intelligence.
+
 ## What It Does
 
 - Track projects across project groups such as Open Source, Client Work, or Personal.
