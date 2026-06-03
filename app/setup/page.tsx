@@ -177,7 +177,7 @@ function ProjectOnboardingCard() {
     <section className="surface-solid p-5">
       <div className="eyebrow">Project onboarding</div>
       <ol className="mt-4 space-y-3 text-sm" style={{ color: "var(--color-ink-mute)" }}>
-        <li><strong style={{ color: "var(--color-ink)" }}>Choose an area.</strong> Examples: Open Source, Client Work, Personal.</li>
+        <li><strong style={{ color: "var(--color-ink)" }}>Choose a project group.</strong> Examples: Open Source, Client Work, Personal.</li>
         <li><strong style={{ color: "var(--color-ink)" }}>Add the repo path.</strong> Use the path as seen by the daemon machine.</li>
         <li><strong style={{ color: "var(--color-ink)" }}>Pick an agent.</strong> Claude Code, Codex, Gemini CLI, OpenCode, or Goose can be the project default.</li>
         <li><strong style={{ color: "var(--color-ink)" }}>Sync docs.</strong> Praxia reads README, VISION, and ARCHITECTURE files when available.</li>

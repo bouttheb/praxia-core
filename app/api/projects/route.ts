@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       `
     )[0]?.id;
 
-  if (!areaId) return NextResponse.json({ error: "could not create area" }, { status: 500 });
+  if (!areaId) return NextResponse.json({ error: "could not create project group" }, { status: 500 });
 
   const [project] = await sql<{ id: number }[]>`
     INSERT INTO projects (

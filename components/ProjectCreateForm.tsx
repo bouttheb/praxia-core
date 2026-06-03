@@ -47,7 +47,7 @@ export function ProjectCreateForm() {
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
         <label className="block text-sm font-medium">
-          Area
+          Project group
           <input className="input mt-2 w-full" value={areaName} onChange={(event) => setAreaName(event.target.value)} />
         </label>
         <label className="block text-sm font-medium">

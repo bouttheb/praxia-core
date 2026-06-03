@@ -87,7 +87,7 @@ export function LeftNav({ areas }: { areas: AreaNavItem[] }) {
 
         {areas.length > 0 && (
           <div className="mt-6">
-            <div className="eyebrow px-3 mb-2">Areas</div>
+            <div className="eyebrow px-3 mb-2">Project Groups</div>
             <ul className="space-y-0.5">
               {areas.slice(0, 10).map((area) => (
                 <li key={area.id}>

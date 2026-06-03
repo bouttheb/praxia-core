@@ -87,15 +87,24 @@ export function ProjectImportPanel() {
         Find git repos and README/VISION docs under a local folder, then import the ones you choose.
       </p>
       <div className="grid md:grid-cols-[minmax(0,1fr)_180px_140px] gap-3 mt-4">
-        <input className="input w-full font-mono text-sm" value={root} onChange={(event) => setRoot(event.target.value)} />
-        <input className="input w-full" value={areaName} onChange={(event) => setAreaName(event.target.value)} />
-        <select className="input w-full" value={agent} onChange={(event) => setAgent(event.target.value as AgentKey)}>
-          {agentOptions.map((option) => (
-            <option key={option.key} value={option.key}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <label className="block text-sm font-medium">
+          Folder
+          <input className="input mt-2 w-full font-mono text-sm" value={root} onChange={(event) => setRoot(event.target.value)} />
+        </label>
+        <label className="block text-sm font-medium">
+          Project group
+          <input className="input mt-2 w-full" value={areaName} onChange={(event) => setAreaName(event.target.value)} />
+        </label>
+        <label className="block text-sm font-medium">
+          Agent
+          <select className="input mt-2 w-full" value={agent} onChange={(event) => setAgent(event.target.value as AgentKey)}>
+            {agentOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className="mt-3 flex gap-2 flex-wrap">
         <button type="button" className="btn" onClick={scan} disabled={status === "scanning"}>

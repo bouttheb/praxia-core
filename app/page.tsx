@@ -46,7 +46,7 @@ export default async function Home() {
               <h1 className="serif text-4xl mt-2">Project dashboard</h1>
               <div className="mt-2 text-sm" style={{ color: "var(--color-ink-mute)" }}>
                 {totalProjects > 0
-                  ? `${totalProjects} projects across ${areas.length} areas - ${overall}% overall progress`
+                  ? `${totalProjects} projects across ${areas.length} project groups - ${overall}% overall progress`
                   : "Add projects to start tracking AI coding work."}
               </div>
             </div>
@@ -99,7 +99,7 @@ export default async function Home() {
             <div className="surface-solid p-6">
               <h2 className="serif text-2xl">No projects yet</h2>
               <p className="mt-2 text-sm" style={{ color: "var(--color-ink-mute)" }}>
-                Use the setup page or seed script to create your first area and project.
+                Use the setup page or seed script to create your first project group and project.
               </p>
               <Link href="/setup" className="btn btn-primary mt-4">
                 Open setup

@@ -13,7 +13,7 @@ in the local repo.
 
 ## What It Does
 
-- Track projects across areas such as Open Source, Client Work, or Personal.
+- Track projects across project groups such as Open Source, Client Work, or Personal.
 - Store each project's working directory, default agent, progress, and latest update.
 - Sync project docs from `docs/VISION.md`, `VISION.md`, `README.md`, and architecture docs.
 - Queue commands from a web dashboard.
@@ -89,7 +89,7 @@ psql "$DATABASE_URL" -f db/migrations/001_expand_agent_adapters.sql
 
 Open `/setup` and add one row per repo:
 
-- **Area**: a group such as Open Source, Client Work, or Personal Projects.
+- **Project Group**: a group such as Open Source, Client Work, or Personal Projects.
 - **Project name**: the display name on the dashboard.
 - **Working directory**: the repo path as seen by the daemon machine.
 - **Default agent**: choose Claude Code, Codex, Gemini CLI, OpenCode, or Goose.

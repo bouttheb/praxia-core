@@ -63,7 +63,7 @@ export function AreaSection({ area, areaPct }: { area: AreaWithProjects; areaPct
       {!(collapsed && hydrated) &&
         (area.projects.length === 0 ? (
           <div className="text-sm" style={{ color: "var(--color-ink-faint)" }}>
-            No projects in this area yet.
+            No projects in this project group yet.
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
