@@ -20,6 +20,10 @@ export async function POST(req: Request) {
       body: string;
       agent: AgentKey;
       working_dir: string | null;
+      completion_percent: number;
+      vision_md: string | null;
+      latest_today: string | null;
+      latest_tomorrow: string | null;
     }[]
   >`
     WITH candidate AS (
@@ -46,9 +50,26 @@ export async function POST(req: Request) {
       started_at = NOW(),
       updated_at = NOW()
     FROM candidate, projects p
+    LEFT JOIN LATERAL (
+      SELECT today, tomorrow
+      FROM updates u
+      WHERE u.project_id = p.id
+      ORDER BY u.created_at DESC
+      LIMIT 1
+    ) lu ON TRUE
     WHERE c.id = candidate.id
       AND p.id = c.project_id
-    RETURNING c.id, c.project_id, p.name AS project_name, c.body, c.agent, c.working_dir
+    RETURNING
+      c.id,
+      c.project_id,
+      p.name AS project_name,
+      c.body,
+      c.agent,
+      c.working_dir,
+      p.completion_percent,
+      p.vision_md,
+      lu.today AS latest_today,
+      lu.tomorrow AS latest_tomorrow
   `;
 
   return NextResponse.json({ command: command ?? null });

@@ -16,7 +16,7 @@ in the local repo.
 - Sync project docs from `docs/VISION.md`, `VISION.md`, `README.md`, and architecture docs.
 - Queue commands from a web dashboard.
 - Let a local daemon claim commands and run your selected local AI coding agent.
-- Report results, blockers, failures, and completed work back to the dashboard.
+- Report results, blockers, failures, completed work, refreshed docs, and completion percentage back to the dashboard.
 
 ## How Praxia Is Different
 

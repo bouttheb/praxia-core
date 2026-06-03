@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { clampCompletionPercent, parsePraxiaProgressReport } from "@/lib/progress-report";
 import { requireDaemonKey } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export async function PATCH(req: Request, { params }: Params) {
     error?: unknown;
     exitCode?: unknown;
     durationMs?: unknown;
+    sourceDocsMarkdown?: unknown;
   } | null;
 
   const status = typeof body?.status === "string" ? body.status : "";
@@ -33,9 +35,21 @@ export async function PATCH(req: Request, { params }: Params) {
   const error = typeof body?.error === "string" ? body.error : null;
   const exitCode = Number.isFinite(Number(body?.exitCode)) ? Number(body?.exitCode) : null;
   const durationMs = Number.isFinite(Number(body?.durationMs)) ? Number(body?.durationMs) : null;
+  const sourceDocsMarkdown =
+    typeof body?.sourceDocsMarkdown === "string" && body.sourceDocsMarkdown.trim()
+      ? body.sourceDocsMarkdown.trim().slice(0, 150_000)
+      : null;
 
-  const [updated] = await sql<{ id: number; project_id: number; auto_log: boolean }[]>`
-    UPDATE commands
+  const [updated] = await sql<
+    {
+      id: number;
+      project_id: number;
+      auto_log: boolean;
+      completion_percent: number;
+      vision_md: string | null;
+    }[]
+  >`
+    UPDATE commands c
     SET
       status = ${status},
       result = ${result},
@@ -44,21 +58,50 @@ export async function PATCH(req: Request, { params }: Params) {
       duration_ms = ${durationMs},
       completed_at = NOW(),
       updated_at = NOW()
-    WHERE id = ${commandId}
-    RETURNING id, project_id, auto_log
+    FROM projects p
+    WHERE c.id = ${commandId}
+      AND p.id = c.project_id
+    RETURNING c.id, c.project_id, c.auto_log, p.completion_percent, p.vision_md
   `;
 
   if (!updated) return NextResponse.json({ error: "not found" }, { status: 404 });
 
-  if (updated.auto_log && status === "completed") {
-    const today = result?.trim().slice(0, 4000) || "Command completed.";
+  const report = parsePraxiaProgressReport(result);
+  const nextCompletion =
+    status === "completed" && report?.completionPercent != null
+      ? clampCompletionPercent(report.completionPercent)
+      : updated.completion_percent;
+
+  if (sourceDocsMarkdown && sourceDocsMarkdown !== updated.vision_md) {
     await sql`
-      INSERT INTO updates (project_id, today, tomorrow, completion_percent, source)
-      SELECT ${updated.project_id}, ${today}, 'Review the run result and choose the next command.', completion_percent, 'daemon'
-      FROM projects
+      UPDATE projects
+      SET vision_md = ${sourceDocsMarkdown}, updated_at = NOW()
       WHERE id = ${updated.project_id}
     `;
   }
 
-  return NextResponse.json({ ok: true });
+  if (updated.auto_log && status === "completed") {
+    const today = report?.summary ?? result?.trim().slice(0, 4000) ?? "Command completed.";
+    const tomorrow = report?.next ?? "Review the run result and choose the next command.";
+    await sql.begin(async (tx) => {
+      await tx`
+        UPDATE projects
+        SET completion_percent = ${nextCompletion}, updated_at = NOW()
+        WHERE id = ${updated.project_id}
+      `;
+      await tx`
+        INSERT INTO updates (project_id, today, tomorrow, completion_percent, source)
+        VALUES (${updated.project_id}, ${today}, ${tomorrow}, ${nextCompletion}, 'daemon')
+      `;
+    });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    progress: {
+      completionPercent: nextCompletion,
+      parsedReport: Boolean(report),
+      sourceDocsSynced: Boolean(sourceDocsMarkdown),
+    },
+  });
 }
