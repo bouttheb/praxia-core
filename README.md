@@ -138,16 +138,23 @@ The hosted layer adds accounts, organizations, daemon device pairing, audit
 events, and billing boundaries while keeping command execution on the user's own
 machine through an outbound-only daemon.
 
-## Security Notes
+## Security Model
 
-Praxia Core can ask an agent to modify files in a local repo. Treat the daemon
-as a powerful local automation process.
+Praxia Core is local-first, but it is intentionally powerful. The dashboard can
+queue work for a daemon that runs local coding agents inside project
+directories. Treat the daemon like a trusted local automation tool.
 
-- Keep `DASHBOARD_WRITE_KEY` private.
-- Use a private network, VPN, or authenticated reverse proxy before exposing the app.
+Recommended defaults:
+
+- Run Praxia Core on `localhost` for personal use.
+- If exposing it beyond your machine, put it behind a VPN, private network, or authenticated reverse proxy.
+- Set strong `COMMAND_KEY` and `DASHBOARD_WRITE_KEY` values before non-local exposure.
 - Only add project directories you trust.
 - Review queued commands before running unattended automation.
-- Do not commit `.env.local` or `~/.praxia/dashboard.env`.
+- Never commit `.env.local`, daemon tokens, or dashboard keys.
+
+In production, Praxia Core fails closed for non-loopback command APIs unless
+`COMMAND_KEY` is configured. See [SECURITY.md](SECURITY.md) for details.
 
 ## Public Scrub
 
