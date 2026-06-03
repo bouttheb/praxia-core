@@ -1,5 +1,7 @@
 # Praxia Core
 
+[Website](https://trypraxia.com) · [Hosted app](https://app.trypraxia.com) · [GitHub](https://github.com/bouttheb/praxia-core)
+
 Praxia Core is a self-hosted dashboard for managing multiple AI coding projects
 across local agents from your phone or any browser.
 
