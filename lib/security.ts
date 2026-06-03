@@ -1,6 +1,14 @@
 import path from "node:path";
+import { timingSafeEqual } from "node:crypto";
 
 const MAX_COMMAND_BYTES = 100_000;
+
+export function safeCompareSecret(provided: string | null | undefined, expected: string | null | undefined) {
+  if (!provided || !expected) return false;
+  const providedBuffer = Buffer.from(provided);
+  const expectedBuffer = Buffer.from(expected);
+  return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
+}
 
 export function getBearerToken(req: Request): string | null {
   const auth = req.headers.get("authorization") ?? "";
@@ -16,7 +24,7 @@ export function requireDaemonKey(req: Request): Response | null {
       { status: 503 },
     );
   }
-  if (getBearerToken(req) !== expected) {
+  if (!safeCompareSecret(getBearerToken(req), expected)) {
     return Response.json({ error: "daemon write key required" }, { status: 401 });
   }
   return null;
@@ -24,11 +32,31 @@ export function requireDaemonKey(req: Request): Response | null {
 
 export function requireCommandKeyIfConfigured(req: Request): Response | null {
   const expected = process.env.COMMAND_KEY;
-  if (!expected) return null;
-  if (req.headers.get("x-praxia-command-key") === expected || getBearerToken(req) === expected) {
+  if (!expected) {
+    if (process.env.NODE_ENV === "production" && !isLoopbackRequest(req)) {
+      return Response.json(
+        { error: "COMMAND_KEY must be configured before exposing Praxia command APIs." },
+        { status: 503 },
+      );
+    }
+    return null;
+  }
+  if (
+    safeCompareSecret(req.headers.get("x-praxia-command-key"), expected) ||
+    safeCompareSecret(getBearerToken(req), expected)
+  ) {
     return null;
   }
   return Response.json({ error: "command key required" }, { status: 401 });
+}
+
+function isLoopbackRequest(req: Request) {
+  try {
+    const hostname = new URL(req.url).hostname.toLowerCase();
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname === "[::1]";
+  } catch {
+    return false;
+  }
 }
 
 export function checkCommandBody(value: unknown): string | Response {

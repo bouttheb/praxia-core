@@ -64,7 +64,7 @@ daemon.set("GOOSE_BIN", ensure(process.env.GOOSE_BIN || daemon.get("GOOSE_BIN"),
 daemon.set("DAEMON_POLL_INTERVAL_MS", ensure(process.env.DAEMON_POLL_INTERVAL_MS || daemon.get("DAEMON_POLL_INTERVAL_MS"), "5000"));
 
 mkdirSync(dirname(daemonEnvPath), { recursive: true });
-writeFileSync(localEnvPath, serializeEnv(local), "utf8");
+writeFileSync(localEnvPath, serializeEnv(local), { encoding: "utf8", mode: 0o600 });
 writeFileSync(daemonEnvPath, serializeEnv(daemon), { encoding: "utf8", mode: 0o600 });
 
 console.log("Praxia Core local config written.");

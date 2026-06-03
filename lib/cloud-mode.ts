@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
-import { getBearerToken } from "@/lib/security";
+import { getBearerToken, safeCompareSecret } from "@/lib/security";
 
 export function isCloudMode() {
   return process.env.PRAXIA_MODE === "cloud";
@@ -28,7 +28,10 @@ export function requireHostedAdminKey(req: Request) {
       { status: 503 },
     );
   }
-  if (getBearerToken(req) === expected || req.headers.get("x-praxia-hosted-admin-key") === expected) {
+  if (
+    safeCompareSecret(getBearerToken(req), expected) ||
+    safeCompareSecret(req.headers.get("x-praxia-hosted-admin-key"), expected)
+  ) {
     return null;
   }
   return NextResponse.json({ error: "hosted admin key required" }, { status: 401 });

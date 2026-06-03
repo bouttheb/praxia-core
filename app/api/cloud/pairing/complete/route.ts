@@ -15,8 +15,11 @@ export async function POST(req: Request) {
   } | null;
 
   const code = typeof body?.code === "string" ? body.code.trim().toUpperCase() : "";
-  const daemonId = typeof body?.daemonId === "string" && body.daemonId.trim() ? body.daemonId.trim() : "hosted-daemon";
-  const label = typeof body?.label === "string" && body.label.trim() ? body.label.trim() : daemonId;
+  const daemonId =
+    typeof body?.daemonId === "string" && body.daemonId.trim()
+      ? body.daemonId.trim().slice(0, 120)
+      : "hosted-daemon";
+  const label = typeof body?.label === "string" && body.label.trim() ? body.label.trim().slice(0, 160) : daemonId;
   if (!code) return NextResponse.json({ error: "code required" }, { status: 400 });
 
   const [pairing] = await sql<
@@ -27,13 +30,15 @@ export async function POST(req: Request) {
       expires_at: string;
     }[]
   >`
-    SELECT id, organization_id, status, expires_at
-    FROM daemon_pairing_codes
+    UPDATE daemon_pairing_codes
+    SET status = 'used', claimed_by_daemon_id = ${daemonId}, claimed_at = NOW()
     WHERE code_hash = ${hashSecret(code)}
-    LIMIT 1
+      AND status = 'pending'
+      AND expires_at > NOW()
+    RETURNING id, organization_id, status, expires_at
   `;
 
-  if (!pairing || pairing.status !== "pending" || new Date(pairing.expires_at).getTime() < Date.now()) {
+  if (!pairing) {
     return NextResponse.json({ error: "pairing code is invalid or expired" }, { status: 404 });
   }
 
@@ -56,12 +61,6 @@ export async function POST(req: Request) {
       'active'
     )
     RETURNING id
-  `;
-
-  await sql`
-    UPDATE daemon_pairing_codes
-    SET status = 'used', claimed_by_daemon_id = ${daemonId}, claimed_at = NOW()
-    WHERE id = ${pairing.id}
   `;
 
   await sql`

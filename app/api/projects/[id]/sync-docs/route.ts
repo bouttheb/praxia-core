@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { syncProjectSourceDocs } from "@/lib/project-source-docs";
+import { requireCommandKeyIfConfigured } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -22,6 +23,9 @@ export async function GET(_req: Request, { params }: Params) {
 }
 
 export async function POST(req: Request, { params }: Params) {
+  const guard = requireCommandKeyIfConfigured(req);
+  if (guard) return guard;
+
   const { id } = await params;
   const projectId = Number(id);
   if (!Number.isFinite(projectId)) {
