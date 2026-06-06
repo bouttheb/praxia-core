@@ -6,8 +6,9 @@ import { parseAgentKey } from "@/lib/agents";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  return NextResponse.json({ areas: await loadAreas() });
+export async function GET(req: Request) {
+  const includeHidden = new URL(req.url).searchParams.get("show_hidden") === "true";
+  return NextResponse.json({ areas: await loadAreas({ includeHidden }) });
 }
 
 export async function POST(req: Request) {
@@ -16,6 +17,7 @@ export async function POST(req: Request) {
 
   const body = (await req.json().catch(() => null)) as {
     areaName?: unknown;
+    area_id?: unknown;
     name?: unknown;
     description?: unknown;
     workingDirectory?: unknown;
@@ -29,9 +31,10 @@ export async function POST(req: Request) {
   const workingDirectory = typeof body?.workingDirectory === "string" ? body.workingDirectory.trim() || null : null;
   const agent = parseAgentKey(body?.agent);
 
-  const [existingArea] = await sql<{ id: number }[]>`
-    SELECT id FROM areas WHERE name = ${areaName} ORDER BY id LIMIT 1
-  `;
+  const requestedAreaId = Number(body?.area_id);
+  const [existingArea] = Number.isFinite(requestedAreaId)
+    ? await sql<{ id: number }[]>`SELECT id FROM areas WHERE id = ${requestedAreaId} LIMIT 1`
+    : await sql<{ id: number }[]>`SELECT id FROM areas WHERE name = ${areaName} ORDER BY id LIMIT 1`;
 
   const areaId =
     existingArea?.id ??

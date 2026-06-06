@@ -93,6 +93,7 @@ apply the migrations once:
 ```bash
 psql "$DATABASE_URL" -f db/migrations/001_expand_agent_adapters.sql
 psql "$DATABASE_URL" -f db/migrations/002_scope_workflows.sql
+psql "$DATABASE_URL" -f db/migrations/003_manage_project_specs.sql
 ```
 
 ## Onboarding Projects

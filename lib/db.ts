@@ -44,6 +44,8 @@ export type Project = {
   agent: AgentKey;
   fallback_agent: AgentKey | null;
   required_daemon_id: string | null;
+  due_date: string | null;
+  due_date_changed_at: string | null;
   updated_at: string;
 };
 

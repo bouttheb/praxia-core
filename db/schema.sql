@@ -64,12 +64,16 @@ CREATE TABLE IF NOT EXISTS projects (
   agent TEXT NOT NULL DEFAULT 'claude' CHECK (agent IN ('claude', 'codex', 'gemini', 'opencode', 'goose')),
   fallback_agent TEXT CHECK (fallback_agent IN ('claude', 'codex', 'gemini', 'opencode', 'goose')),
   required_daemon_id TEXT,
+  due_date DATE,
+  due_date_changed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS projects_area_idx ON projects(area_id, sort_order);
 CREATE INDEX IF NOT EXISTS projects_required_daemon_idx ON projects(required_daemon_id) WHERE required_daemon_id IS NOT NULL;
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS due_date DATE;
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS due_date_changed_at TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS updates (
   id SERIAL PRIMARY KEY,

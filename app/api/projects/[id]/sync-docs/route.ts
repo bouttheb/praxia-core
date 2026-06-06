@@ -34,5 +34,8 @@ export async function POST(req: Request, { params }: Params) {
 
   const result = await syncProjectSourceDocs(projectId);
   if (!result) return NextResponse.json({ error: "not found" }, { status: 404 });
+  if (req.headers.get("accept")?.includes("application/json")) {
+    return NextResponse.json(result);
+  }
   return NextResponse.redirect(new URL("/", req.url));
 }

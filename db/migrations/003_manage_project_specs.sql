@@ -1,0 +1,2 @@
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS due_date DATE;
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS due_date_changed_at TIMESTAMPTZ;

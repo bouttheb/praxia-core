@@ -24,6 +24,8 @@ function demoAreas(): AreaWithProjects[] {
           agent: "codex",
           fallback_agent: null,
           required_daemon_id: null,
+          due_date: null,
+          due_date_changed_at: null,
           updated_at: now,
           latest_update: {
             id: 1,
@@ -49,6 +51,8 @@ function demoAreas(): AreaWithProjects[] {
           agent: "claude",
           fallback_agent: null,
           required_daemon_id: null,
+          due_date: null,
+          due_date_changed_at: null,
           updated_at: now,
           latest_update: {
             id: 2,
@@ -82,6 +86,8 @@ function demoAreas(): AreaWithProjects[] {
           agent: "claude",
           fallback_agent: null,
           required_daemon_id: null,
+          due_date: null,
+          due_date_changed_at: null,
           updated_at: now,
           latest_update: {
             id: 3,
@@ -98,8 +104,9 @@ function demoAreas(): AreaWithProjects[] {
   ];
 }
 
-export async function loadAreas(): Promise<AreaWithProjects[]> {
+export async function loadAreas(options: { includeHidden?: boolean } = {}): Promise<AreaWithProjects[]> {
   if (!process.env.DATABASE_URL) return demoAreas();
+  const hiddenFilter = options.includeHidden ? sql`` : sql`a.hidden = FALSE AND`;
 
   const rows = await sql<
     {
@@ -119,6 +126,8 @@ export async function loadAreas(): Promise<AreaWithProjects[]> {
       agent: AgentKey | null;
       fallback_agent: AgentKey | null;
       required_daemon_id: string | null;
+      due_date: string | null;
+      due_date_changed_at: string | null;
       project_updated_at: string | null;
       latest_id: number | null;
       latest_today: string | null;
@@ -148,6 +157,8 @@ export async function loadAreas(): Promise<AreaWithProjects[]> {
       p.agent,
       p.fallback_agent,
       p.required_daemon_id,
+      p.due_date::text AS due_date,
+      p.due_date_changed_at AS due_date_changed_at,
       p.updated_at AS project_updated_at,
       lu.id AS latest_id,
       lu.today AS latest_today,
@@ -177,7 +188,7 @@ export async function loadAreas(): Promise<AreaWithProjects[]> {
       WHERE c.project_id = p.id
         AND c.created_at > NOW() - INTERVAL '14 days'
     ) cc ON TRUE
-    WHERE a.hidden = FALSE
+    WHERE ${hiddenFilter} TRUE
     ORDER BY a.sort_order, a.id, p.sort_order, p.id
   `;
 
@@ -192,7 +203,7 @@ export async function loadAreas(): Promise<AreaWithProjects[]> {
         projects: [],
       });
     }
-    if (row.project_id == null || row.project_hidden) continue;
+    if (row.project_id == null || (!options.includeHidden && row.project_hidden)) continue;
     map.get(row.area_id)!.projects.push({
       id: row.project_id,
       area_id: row.area_id,
@@ -207,6 +218,8 @@ export async function loadAreas(): Promise<AreaWithProjects[]> {
       agent: row.agent ?? "claude",
       fallback_agent: row.fallback_agent,
       required_daemon_id: row.required_daemon_id,
+      due_date: row.due_date,
+      due_date_changed_at: row.due_date_changed_at,
       updated_at: row.project_updated_at ?? "",
       latest_update:
         row.latest_id == null
