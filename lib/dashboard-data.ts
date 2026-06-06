@@ -249,9 +249,18 @@ export async function loadCommands(limit = 50): Promise<CommandRow[]> {
       c.created_at,
       c.updated_at,
       c.started_at,
-      c.completed_at
+      c.completed_at,
+      c.workflow_run_id,
+      c.workflow_step_id,
+      wr.template_label AS workflow_template_label,
+      ws.step_index AS workflow_step_index,
+      wr.total_steps AS workflow_total_steps,
+      ws.title AS workflow_step_title,
+      wr.status AS workflow_status
     FROM commands c
     JOIN projects p ON p.id = c.project_id
+    LEFT JOIN workflow_runs wr ON wr.id = c.workflow_run_id
+    LEFT JOIN workflow_steps ws ON ws.id = c.workflow_step_id
     ORDER BY c.created_at DESC
     LIMIT ${limit}
   `;

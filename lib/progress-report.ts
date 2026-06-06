@@ -2,6 +2,10 @@ export type PraxiaProgressReport = {
   summary: string | null;
   next: string | null;
   completionPercent: number | null;
+  workflowStepStatus: string | null;
+  verification: string | null;
+  blockers: string | null;
+  needsInput: string | null;
   scopeChanged: boolean | null;
   docsUpdated: boolean | null;
 };
@@ -25,6 +29,10 @@ export function parsePraxiaProgressReport(output: string | null | undefined): Pr
     summary: clean(fields.get("summary") ?? fields.get("today")),
     next: clean(fields.get("next") ?? fields.get("tomorrow") ?? fields.get("next_step")),
     completionPercent: parsePercent(fields.get("completion_percent") ?? fields.get("progress")),
+    workflowStepStatus: clean(fields.get("workflow_step_status") ?? fields.get("step_status")),
+    verification: clean(fields.get("verification") ?? fields.get("verified")),
+    blockers: clean(fields.get("blockers") ?? fields.get("blocked_by")),
+    needsInput: clean(fields.get("needs_input") ?? fields.get("input_needed")),
     scopeChanged: parseBool(fields.get("scope_changed")),
     docsUpdated: parseBool(fields.get("docs_updated")),
   };
