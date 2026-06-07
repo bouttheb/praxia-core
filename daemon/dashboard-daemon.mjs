@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { spawn } from "node:child_process";
-import { homedir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { commandForAgent } from "./agent-adapters.mjs";
 
@@ -156,7 +156,9 @@ function resolveWorkingDir(value) {
 }
 
 function runProcess({ agent, body, cwd }) {
-  const { bin, args } = commandForAgent(agent, body);
+  const outputDir = mkdtempSync(join(tmpdir(), "praxia-agent-"));
+  const outputPath = join(outputDir, "last-message.txt");
+  const { bin, args } = commandForAgent(agent, body, { outputPath });
   return new Promise((resolveRun) => {
     const started = Date.now();
     let stdout = "";
@@ -175,9 +177,11 @@ function runProcess({ agent, body, cwd }) {
       process.stderr.write(chunk);
     });
     child.on("error", (error) => {
+      const finalMessage = readFinalMessage(outputPath);
+      cleanupOutputDir(outputDir);
       resolveRun({
         status: "failed",
-        result: stdout.trim(),
+        result: finalMessage || stdout.trim(),
         error: error.message,
         exitCode: 127,
         durationMs: Date.now() - started,
@@ -185,15 +189,34 @@ function runProcess({ agent, body, cwd }) {
     });
     child.on("close", (code) => {
       const ok = code === 0;
+      const finalMessage = readFinalMessage(outputPath);
+      cleanupOutputDir(outputDir);
       resolveRun({
         status: ok ? "completed" : "failed",
-        result: stdout.trim(),
+        result: finalMessage || stdout.trim(),
         error: ok ? null : stderr.trim() || `Process exited with code ${code}`,
         exitCode: code,
         durationMs: Date.now() - started,
       });
     });
   });
+}
+
+function readFinalMessage(path) {
+  if (!existsSync(path)) return "";
+  try {
+    return readFileSync(path, "utf8").trim();
+  } catch {
+    return "";
+  }
+}
+
+function cleanupOutputDir(path) {
+  try {
+    rmSync(path, { recursive: true, force: true });
+  } catch {
+    // Best-effort cleanup only.
+  }
 }
 
 async function tick() {

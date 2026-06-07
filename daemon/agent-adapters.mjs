@@ -5,7 +5,15 @@ const adapters = {
   },
   codex: {
     bin: () => process.env.CODEX_BIN || "codex",
-    args: (body) => ["exec", "--full-auto", body],
+    args: (body, options = {}) => [
+      "exec",
+      "--sandbox",
+      "workspace-write",
+      "-c",
+      "approval_policy=\"never\"",
+      ...(options.outputPath ? ["--output-last-message", options.outputPath] : []),
+      body,
+    ],
   },
   gemini: {
     bin: () => process.env.GEMINI_BIN || "gemini",
@@ -21,7 +29,7 @@ const adapters = {
   },
 };
 
-export function commandForAgent(agent, body) {
+export function commandForAgent(agent, body, options = {}) {
   const adapter = adapters[agent] ?? adapters.claude;
-  return { bin: adapter.bin(), args: adapter.args(body) };
+  return { bin: adapter.bin(), args: adapter.args(body, options) };
 }
