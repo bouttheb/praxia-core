@@ -30,11 +30,14 @@ export async function GET(req: Request) {
     return NextResponse.json(project);
   }
 
-  const projects = await sql<{ project_id: number; name: string; completion_percent: number }[]>`
-    SELECT id AS project_id, name, completion_percent
-    FROM projects
-    WHERE archived = FALSE
-    ORDER BY id
+  const projects = await sql<
+    { project_id: number; name: string; completion_percent: number; area_name: string | null }[]
+  >`
+    SELECT p.id AS project_id, p.name, p.completion_percent, a.name AS area_name
+    FROM projects p
+    LEFT JOIN areas a ON a.id = p.area_id
+    WHERE p.archived = FALSE
+    ORDER BY p.id
   `;
   return NextResponse.json({ projects });
 }
