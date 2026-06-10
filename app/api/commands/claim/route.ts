@@ -92,6 +92,22 @@ export async function POST(req: Request) {
     ) lu ON TRUE
   `;
 
+  if (command) {
+    // Recent finished turns for the same project, oldest first, so the daemon
+    // can give the agent conversational continuity. Truncated server-side to
+    // keep the prompt bounded.
+    const history = await sql<{ body: string; result: string | null; error: string | null; status: string }[]>`
+      SELECT LEFT(body, 2000) AS body, LEFT(result, 3000) AS result, LEFT(error, 600) AS error, status
+      FROM commands
+      WHERE project_id = ${command.project_id}
+        AND id <> ${command.id}
+        AND status IN ('completed', 'failed')
+      ORDER BY id DESC
+      LIMIT 6
+    `;
+    (command as Record<string, unknown>).history = history.slice().reverse();
+  }
+
   if (command?.workflow_run_id) {
     await sql`
       UPDATE workflow_runs

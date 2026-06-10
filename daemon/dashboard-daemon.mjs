@@ -75,6 +75,19 @@ ${docs.map((doc) => `## ${doc.path}\n\n${doc.contents}`).join("\n\n")}
 `;
 }
 
+function formatConversationHistory(history) {
+  if (!Array.isArray(history) || history.length === 0) {
+    return "Recent conversation: none yet — this is the first message in this project's chat.";
+  }
+  const turns = history
+    .map((turn) => {
+      const reply = turn.status === "failed" ? `(run failed) ${turn.error || "no error detail"}` : turn.result || "(no reply recorded)";
+      return `User: ${turn.body}\nYou: ${reply}`;
+    })
+    .join("\n---\n");
+  return `Recent conversation (oldest first):\n${turns}`;
+}
+
 function buildAgentPrompt(command, cwd) {
   const localDocs = readProjectSourceDocs(cwd, command.project_name);
   const docs = localDocs || command.vision_md || "No README, VISION, or ARCHITECTURE docs are currently synced.";
@@ -107,7 +120,11 @@ ${docs}
 Latest Praxia update:
 ${latestUpdate || "No prior update logged."}
 
-User command:
+${formatConversationHistory(command.history)}
+
+You are talking with the user in this project's chat thread. Reply conversationally — your final message is shown directly in the chat. Be concrete about what you did, found, or recommend; ask directly for anything you need; push back when something is unwise or underspecified instead of silently doing it.
+
+User message:
 ${command.body}
 
 After you finish, include this exact block at the end of your response so Praxia can update the dashboard:

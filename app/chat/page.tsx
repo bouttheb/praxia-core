@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/AppShell";
-import { CommandComposer } from "@/components/CommandComposer";
+import { ProjectChat } from "@/components/ProjectChat";
 import { loadAreas } from "@/lib/dashboard-data";
 
 export const dynamic = "force-dynamic";
@@ -21,27 +21,18 @@ export default async function ChatPage({ searchParams }: { searchParams: SearchP
 
   return (
     <AppShell>
-      <main className="flex-1 min-w-0 overflow-y-auto cockpit-scroll">
-        <div className="px-6 lg:px-10 py-8 max-w-[980px] mx-auto">
-          <header className="mb-8">
-            <div className="eyebrow">Remote command</div>
-            <h1 className="serif text-4xl mt-2">Command a project</h1>
-            <p className="mt-2 text-sm" style={{ color: "var(--color-ink-mute)" }}>
-              Queue work from your browser or phone. The paired daemon runs it on the machine that has the repo.
-            </p>
-          </header>
-          {projects.length > 0 ? (
-            <CommandComposer
-              projects={projects}
-              initialProjectId={Number.isFinite(initialProjectId) ? initialProjectId : null}
-              initialPrompt={params.prompt ?? ""}
-            />
-          ) : (
-            <div className="surface-solid p-6">
-              Add a project before queueing commands.
-            </div>
-          )}
-        </div>
+      <main className="flex-1 min-w-0 flex overflow-hidden">
+        {projects.length > 0 ? (
+          <ProjectChat
+            projects={projects}
+            initialProjectId={Number.isFinite(initialProjectId) ? initialProjectId : null}
+            initialPrompt={params.prompt ?? ""}
+          />
+        ) : (
+          <div className="p-10 flex-1">
+            <div className="surface-solid p-6">Add a project before starting a conversation.</div>
+          </div>
+        )}
       </main>
     </AppShell>
   );

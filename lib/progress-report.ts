@@ -60,3 +60,7 @@ function parseBool(value: string | undefined) {
   if (/^(no|false|n|0)$/i.test(value.trim())) return false;
   return null;
 }
+
+export function stripPraxiaProgressReport(output: string | null | undefined) {
+  return (output ?? "").replace(REPORT_BLOCK, "").trim();
+}
