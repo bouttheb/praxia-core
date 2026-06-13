@@ -140,6 +140,15 @@ The hosted layer adds accounts, organizations, daemon device pairing, audit
 events, and billing boundaries while keeping command execution on the user's own
 machine through an outbound-only daemon.
 
+## Client-Facing Engines
+
+Praxia workspaces can host "engines" — client-facing product surfaces with
+their own landing page, published deliverables (videos, summaries, memos),
+and a domain-voiced chat agent that improves the product from client feedback
+while escalating out-of-scope requests to the owner. The blueprint types,
+agent doctrine, and playbook for building one live in
+[docs/ENGINE_FRAMEWORK.md](docs/ENGINE_FRAMEWORK.md).
+
 ## Security Model
 
 Praxia Core is local-first, but it is intentionally powerful. The dashboard can
