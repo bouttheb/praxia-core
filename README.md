@@ -2,8 +2,11 @@
 
 [Website](https://trypraxia.com) · [Hosted app](https://app.trypraxia.com) · [GitHub](https://github.com/bouttheb/praxia-core)
 
-Praxia Core is a self-hosted dashboard for managing multiple AI coding projects
-across local agents from your phone or any browser.
+Praxia Core is the **open-source, self-hosted edition** of Praxia — an
+operating system for running work with AI agents. This edition is a self-hosted
+dashboard for managing multiple AI coding projects across local agents from
+your phone or any browser. The managed edition,
+[Praxia Cloud](https://app.trypraxia.com), builds on the same kernel.
 
 It gives you one place to see every project, read its current README/vision
 snapshot, check the latest progress, and queue work for a local machine running
@@ -129,16 +132,22 @@ Common setups:
 
 For always-on daemon setup, see [docs/DAEMON_SERVICE.md](docs/DAEMON_SERVICE.md).
 
-## Hosted Mode
+## Praxia Cloud (Hosted Edition)
 
-This repo also includes the first Praxia Cloud blueprint for a managed hosted
-version. Hosted mode is off by default; self-hosted installs do not need hosted
-accounts, billing, or cloud database credentials.
-
-Inspect the plan at `/cloud` or read [docs/CLOUD_MODE.md](docs/CLOUD_MODE.md).
-The hosted layer adds accounts, organizations, daemon device pairing, audit
-events, and billing boundaries while keeping command execution on the user's own
+Praxia Cloud is the managed, hosted edition of Praxia, live at
+<https://app.trypraxia.com>. It builds on this kernel and adds accounts,
+organizations, daemon device pairing, audit events, billing, and hosted
+client-facing engines, while keeping command execution on the user's own
 machine through an outbound-only daemon.
+
+This repo carries the original hosted-mode blueprint (inspect it at `/cloud`
+or read [docs/CLOUD_MODE.md](docs/CLOUD_MODE.md)). Hosted mode is off by
+default; self-hosted installs do not need hosted accounts, billing, or cloud
+database credentials.
+
+Praxia Core is maintained as a stable, self-contained snapshot of the kernel.
+The hosted edition evolves faster, and Core does not track it
+feature-for-feature.
 
 ## Client-Facing Engines
 
