@@ -24,6 +24,13 @@ export async function POST(req: Request) {
       vision_md: string | null;
       latest_today: string | null;
       latest_tomorrow: string | null;
+      workflow_run_id: number | null;
+      workflow_step_id: number | null;
+      workflow_template_label: string | null;
+      workflow_step_index: number | null;
+      workflow_total_steps: number | null;
+      workflow_step_title: string | null;
+      workflow_definition_of_done: string[] | null;
     }[]
   >`
     WITH candidate AS (
@@ -41,15 +48,41 @@ export async function POST(req: Request) {
       ORDER BY c.created_at ASC
       LIMIT 1
       FOR UPDATE SKIP LOCKED
+    ),
+    updated AS (
+      UPDATE commands c
+      SET
+        status = 'running',
+        claimed_by = ${daemonId},
+        claimed_at = NOW(),
+        started_at = NOW(),
+        updated_at = NOW()
+      FROM candidate
+      WHERE c.id = candidate.id
+      RETURNING c.*
     )
-    UPDATE commands c
-    SET
-      status = 'running',
-      claimed_by = ${daemonId},
-      claimed_at = NOW(),
-      started_at = NOW(),
-      updated_at = NOW()
-    FROM candidate, projects p
+    SELECT
+      u.id,
+      u.project_id,
+      p.name AS project_name,
+      u.body,
+      u.agent,
+      u.working_dir,
+      u.workflow_run_id,
+      u.workflow_step_id,
+      p.completion_percent,
+      p.vision_md,
+      wr.template_label AS workflow_template_label,
+      ws.step_index AS workflow_step_index,
+      wr.total_steps AS workflow_total_steps,
+      ws.title AS workflow_step_title,
+      wr.definition_of_done AS workflow_definition_of_done,
+      lu.today AS latest_today,
+      lu.tomorrow AS latest_tomorrow
+    FROM updated u
+    JOIN projects p ON p.id = u.project_id
+    LEFT JOIN workflow_runs wr ON wr.id = u.workflow_run_id
+    LEFT JOIN workflow_steps ws ON ws.id = u.workflow_step_id
     LEFT JOIN LATERAL (
       SELECT today, tomorrow
       FROM updates u
@@ -57,20 +90,24 @@ export async function POST(req: Request) {
       ORDER BY u.created_at DESC
       LIMIT 1
     ) lu ON TRUE
-    WHERE c.id = candidate.id
-      AND p.id = c.project_id
-    RETURNING
-      c.id,
-      c.project_id,
-      p.name AS project_name,
-      c.body,
-      c.agent,
-      c.working_dir,
-      p.completion_percent,
-      p.vision_md,
-      lu.today AS latest_today,
-      lu.tomorrow AS latest_tomorrow
   `;
+
+  if (command?.workflow_run_id) {
+    await sql`
+      UPDATE workflow_runs
+      SET status = 'running', current_step_index = COALESCE(${command.workflow_step_index}, current_step_index), updated_at = NOW()
+      WHERE id = ${command.workflow_run_id}
+        AND status IN ('queued', 'running')
+    `;
+  }
+  if (command?.workflow_step_id) {
+    await sql`
+      UPDATE workflow_steps
+      SET status = 'running', updated_at = NOW()
+      WHERE id = ${command.workflow_step_id}
+        AND status = 'queued'
+    `;
+  }
 
   return NextResponse.json({ command: command ?? null });
 }

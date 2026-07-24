@@ -43,8 +43,19 @@ export default async function RunsPage() {
                         {command.status.replaceAll("_", " ")}
                       </span>
                       <span className="status-chip">{command.agent}</span>
+                      {command.workflow_template_label && <span className="status-chip">{command.workflow_template_label}</span>}
+                      {command.workflow_step_index != null && command.workflow_total_steps != null && (
+                        <span className="status-chip">
+                          Step {command.workflow_step_index + 1}/{command.workflow_total_steps}
+                        </span>
+                      )}
                       <span className="text-sm font-semibold">{command.project_name}</span>
                     </div>
+                    {command.workflow_step_title && (
+                      <p className="mt-3 text-sm font-semibold">
+                        {command.workflow_step_title}
+                      </p>
+                    )}
                     <p className="mt-3 text-sm whitespace-pre-wrap" style={{ color: "var(--color-ink-mute)" }}>
                       {command.body}
                     </p>

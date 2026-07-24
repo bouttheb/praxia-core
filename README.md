@@ -88,10 +88,11 @@ node daemon/dashboard-daemon.mjs
 The setup page shows recent daemon heartbeats once the local runner connects.
 
 If you already initialized Praxia before the multi-agent adapters were added,
-apply the constraint migration once:
+apply the migrations once:
 
 ```bash
 psql "$DATABASE_URL" -f db/migrations/001_expand_agent_adapters.sql
+psql "$DATABASE_URL" -f db/migrations/002_scope_workflows.sql
 ```
 
 ## Onboarding Projects

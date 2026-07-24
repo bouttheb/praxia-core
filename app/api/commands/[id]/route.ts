@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { clampCompletionPercent, parsePraxiaProgressReport } from "@/lib/progress-report";
 import { requireDaemonKey } from "@/lib/security";
+import { advanceWorkflowAfterCommand } from "@/lib/workflow-queue";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,9 @@ export async function PATCH(req: Request, { params }: Params) {
       ? body.sourceDocsMarkdown.trim().slice(0, 150_000)
       : null;
 
+  const report = parsePraxiaProgressReport(result);
+  const finalStatus = deriveFinalStatus(status, report?.workflowStepStatus);
+
   const [updated] = await sql<
     {
       id: number;
@@ -51,7 +55,7 @@ export async function PATCH(req: Request, { params }: Params) {
   >`
     UPDATE commands c
     SET
-      status = ${status},
+      status = ${finalStatus},
       result = ${result},
       error = ${error},
       exit_code = ${exitCode},
@@ -66,9 +70,8 @@ export async function PATCH(req: Request, { params }: Params) {
 
   if (!updated) return NextResponse.json({ error: "not found" }, { status: 404 });
 
-  const report = parsePraxiaProgressReport(result);
   const nextCompletion =
-    status === "completed" && report?.completionPercent != null
+    finalStatus === "completed" && report?.completionPercent != null
       ? clampCompletionPercent(report.completionPercent)
       : updated.completion_percent;
 
@@ -80,7 +83,7 @@ export async function PATCH(req: Request, { params }: Params) {
     `;
   }
 
-  if (updated.auto_log && status === "completed") {
+  if (updated.auto_log && finalStatus === "completed") {
     const today = report?.summary ?? result?.trim().slice(0, 4000) ?? "Command completed.";
     const tomorrow = report?.next ?? "Review the run result and choose the next command.";
     await sql.begin(async (tx) => {
@@ -96,6 +99,12 @@ export async function PATCH(req: Request, { params }: Params) {
     });
   }
 
+  const workflowAdvance = await advanceWorkflowAfterCommand({
+    commandId,
+    status: finalStatus,
+    resultSummary: report?.summary ?? error ?? result?.trim().slice(0, 1000) ?? null,
+  });
+
   return NextResponse.json({
     ok: true,
     progress: {
@@ -103,5 +112,17 @@ export async function PATCH(req: Request, { params }: Params) {
       parsedReport: Boolean(report),
       sourceDocsSynced: Boolean(sourceDocsMarkdown),
     },
+    workflow: workflowAdvance,
   });
+}
+
+function deriveFinalStatus(status: string, workflowStepStatus: string | null | undefined) {
+  if (status !== "completed") {
+    return status as "failed" | "blocked" | "needs_input" | "cancelled";
+  }
+  const normalized = workflowStepStatus?.trim().toLowerCase().replaceAll(" ", "_");
+  if (normalized === "blocked" || normalized === "needs_input" || normalized === "failed" || normalized === "cancelled") {
+    return normalized;
+  }
+  return "completed";
 }

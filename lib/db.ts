@@ -95,4 +95,11 @@ export type CommandRow = {
   updated_at: string;
   started_at: string | null;
   completed_at: string | null;
+  workflow_run_id: number | null;
+  workflow_step_id: number | null;
+  workflow_template_label: string | null;
+  workflow_step_index: number | null;
+  workflow_total_steps: number | null;
+  workflow_step_title: string | null;
+  workflow_status: CommandStatus | null;
 };

@@ -81,12 +81,24 @@ function buildAgentPrompt(command, cwd) {
   const latestUpdate = [command.latest_today, command.latest_tomorrow]
     .filter(Boolean)
     .join("\nNext: ");
+  const workflowContext = command.workflow_run_id
+    ? `Workflow context:
+Template: ${command.workflow_template_label || "Praxia workflow"}
+Step: ${Number(command.workflow_step_index ?? 0) + 1} of ${command.workflow_total_steps || "?"}
+Step title: ${command.workflow_step_title || "Current step"}
+Definition of done:
+${Array.isArray(command.workflow_definition_of_done) && command.workflow_definition_of_done.length > 0
+  ? command.workflow_definition_of_done.map((item) => `- ${item}`).join("\n")
+  : "- Complete the current step and report verification evidence"}
+`
+    : "Workflow context: ad hoc command";
 
   return `You are working inside a Praxia-managed AI coding project.
 
 Project: ${command.project_name}
 Current Praxia completion: ${Number(command.completion_percent || 0)}%
 Working directory: ${cwd}
+${workflowContext}
 
 Project scope docs:
 
@@ -104,6 +116,10 @@ PRAXIA_REPORT
 summary: one concise paragraph describing what you completed
 next: the next useful step or blocker
 completion_percent: integer from 0 to 100 based on the project scope docs
+workflow_step_status: completed, blocked, needs_input, failed, or cancelled
+verification: what you ran or inspected to verify this step
+blockers: any blocker, or none
+needs_input: the exact human input needed, or none
 scope_changed: yes or no
 docs_updated: yes or no
 END_PRAXIA_REPORT

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { loadCommands } from "@/lib/dashboard-data";
-import { sql } from "@/lib/db";
 import { checkCommandBody, requireCommandKeyIfConfigured } from "@/lib/security";
-import { parseAgentKey, type AgentKey } from "@/lib/agents";
+import { parseAgentKey } from "@/lib/agents";
+import { assessScope } from "@/lib/scope-gate";
+import { loadCommandProjectContext, queueWorkflow } from "@/lib/workflow-queue";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export async function POST(req: Request) {
     body?: unknown;
     agent?: unknown;
     autoLog?: unknown;
+    force?: unknown;
   } | null;
 
   const projectId = Number(body?.projectId);
@@ -29,21 +31,38 @@ export async function POST(req: Request) {
   const commandBody = checkCommandBody(body?.body);
   if (commandBody instanceof Response) return commandBody;
 
-  const [project] = await sql<{ id: number; agent: AgentKey; working_directory: string | null }[]>`
-    SELECT id, agent, working_directory
-    FROM projects
-    WHERE id = ${projectId}
-      AND archived = FALSE
-      AND hidden = FALSE
-  `;
+  const project = await loadCommandProjectContext(projectId);
   if (!project) return NextResponse.json({ error: "project not found" }, { status: 404 });
 
   const agent = parseAgentKey(body?.agent, project.agent);
-  const [command] = await sql<{ id: number }[]>`
-    INSERT INTO commands (project_id, body, agent, working_dir, auto_log)
-    VALUES (${projectId}, ${commandBody}, ${agent}, ${project.working_directory}, ${body?.autoLog !== false})
-    RETURNING id
-  `;
+  const assessment = assessScope({
+    projectName: project.name,
+    projectDescription: project.description,
+    projectVision: project.vision_md,
+    latestToday: project.latest_today,
+    latestTomorrow: project.latest_tomorrow,
+    completionPercent: project.completion_percent,
+    commandBody,
+  });
 
-  return NextResponse.json({ ok: true, commandId: command.id });
+  const force = body?.force === true;
+  if (assessment.decision === "reject" || (!force && assessment.decision !== "execute")) {
+    return NextResponse.json(
+      {
+        error: assessment.decision === "reject" ? "command rejected by scope gate" : "scope clarification required",
+        assessment,
+      },
+      { status: assessment.decision === "reject" ? 403 : 422 },
+    );
+  }
+
+  const queued = await queueWorkflow({
+    project,
+    commandBody,
+    agent,
+    autoLog: body?.autoLog !== false,
+    assessment: force && assessment.decision !== "execute" ? { ...assessment, decision: "execute" } : assessment,
+  });
+
+  return NextResponse.json({ ok: true, commandId: queued.commandId, workflowRunId: queued.workflowRunId, assessment });
 }
